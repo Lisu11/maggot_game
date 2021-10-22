@@ -10,6 +10,7 @@ defmodule MaggotEngine.Application do
     children = [
       # Starts a worker by calling: MaggotEngine.Worker.start_link(arg)
       # {MaggotEngine.Worker, arg}
+      :poolboy.child_spec(:worker, poolboy_config())
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -17,4 +18,14 @@ defmodule MaggotEngine.Application do
     opts = [strategy: :one_for_one, name: MaggotEngine.Supervisor]
     Supervisor.start_link(children, opts)
   end
+
+  defp poolboy_config do
+    [
+      name: {:local, :worker},
+      worker_module: MaggotEngine.Game,
+      size: 1,
+      max_overflow: 2
+    ]
+  end
+
 end
