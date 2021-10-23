@@ -12,7 +12,7 @@ defmodule MaggotEngine.Game do
   end
 
   @impl true
-  def handle_call(:add_player, from, state) do
+  def handle_call(:add_player, {from, _}, state) do
     { :reply, :ok, State.add_player(state, from) }
   end
 
@@ -26,13 +26,12 @@ defmodule MaggotEngine.Game do
   end
 
   def add_player(pid) do
-    GenServer.call(pid, {:add_player})
+    GenServer.call(pid, :add_player)
   end
 
   defp transform_state_and_notify_players(state) do
     state
-    # |> IO.inspect()
-    # |> State.update_bugs()
+    # |> State.update_bugs() # uncomment this
       |> State.move_and_notify()
   end
 

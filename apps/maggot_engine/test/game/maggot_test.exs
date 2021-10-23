@@ -28,18 +28,18 @@ defmodule MaggotEngineTest.MaggotTest do
       assert Enum.count(maggot.segments) == Enum.count(moved.segments)
     end
 
-    test "when maggot has a bug as the last part his size should grow", %{bugged_maggot: maggot} do
+    test "when maggot has a bug at the end his size should grow", %{bugged_maggot: maggot} do
 
       {_ , moved} = Maggot.move(maggot)
 
       assert Enum.count(maggot.segments) + 1 == Enum.count(moved.segments)
     end
 
-    test "bugged maggot moved has only changes in + part", %{bugged_maggot: maggot}  do
+    test "bugged maggot moved has only changes in '+' part", %{bugged_maggot: maggot}  do
       {%{"+" => [_ | _], "-" => []} , _} = Maggot.move(maggot)
     end
 
-    test "not-bugged maggot moved has changes in both + and _ part", %{maggot: maggot}  do
+    test "not-bugged maggot moved has changes in both '+' and '-' part", %{maggot: maggot}  do
       {%{"+" => [_ | _], "-" => [_ | _]} , _} = Maggot.move(maggot)
     end
   end
