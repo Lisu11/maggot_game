@@ -1,6 +1,6 @@
 defmodule MaggotEngine.Game.Maggot do
-  @enforce_keys [:segments, :direction, :len]
-  defstruct [:segments, :direction, :len, :bugs]
+  @enforce_keys [:segments, :direction]
+  defstruct [:segments, :direction, :bugs]
 
   alias __MODULE__
 
@@ -9,7 +9,7 @@ defmodule MaggotEngine.Game.Maggot do
     %Maggot{
       segments: [{x, y}, {x+1, y}],
       direction: :w,
-      len: 2,
+      # len: 2,
       bugs: []
     }
   end
@@ -21,7 +21,7 @@ defmodule MaggotEngine.Game.Maggot do
     {changes, %Maggot{maggot | segments: [new_head | segments]}}
   end
 
-  def add_bug(%Maggot{} = maggot) do
+  def eat_bug(%Maggot{} = maggot) do
     [head | _ ] = maggot.segments
     %Maggot{maggot | bugs: [head | maggot.bugs]}
   end
@@ -30,7 +30,7 @@ defmodule MaggotEngine.Game.Maggot do
     case Enum.reverse segments do
       [h | t] ->
         if h in bugs do
-          {[], Enum.reverse(t)}
+          {[], Enum.reverse([h | t])}
         else
           {[h], Enum.reverse(t)}
         end
@@ -38,9 +38,10 @@ defmodule MaggotEngine.Game.Maggot do
   end
 
 
-  def forward(%Maggot{segments: [h | _], direction: d}), do: forward(d, h)
-  defp forward(:w = _direction, {x, y} = _head_position), do: {x+1, y}
-  defp forward(:n = _direction, {x, y} = _head_position), do: {x, y+1}
-  defp forward(:s = _direction, {x, y} = _head_position), do: {x, y-1}
-  defp forward(:e = _direction, {x, y} = _head_position), do: {x-1, y}
+  def forward(%Maggot{segments: [h , n | _], direction: d}), do: forward(d, h, n)
+  defp forward(:w, {x, y}, {x2, _}) when x <= x2, do: {x-1, y}
+  defp forward(:n, {x, y}, {_, y2}) when y2 <= y, do: {x, y+1}
+  defp forward(:s, {x, y}, {_, y2}) when y2 >= y, do: {x, y-1}
+  defp forward(:e, {x, y}, {x2, _}) when x >= x2, do: {x+1, y}
+  defp forward( _direction, _head_position, _neck_position), do: :error
 end
