@@ -25,6 +25,11 @@
             <%= text_input f, :message, placeholder: "Enter text..." %>
         </form>
     </div>
+    <div id="chat-users-container">
+        <%= for gamer <- @gamers do %>
+            <div> <%= gamer %> </div>
+        <% end %>
+    </div>
 
     </div>
 </div>
