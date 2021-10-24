@@ -11,9 +11,10 @@ defmodule MaggotWeb.Application do
       # Start the Telemetry supervisor
       MaggotWeb.Telemetry,
       # Start the Endpoint (http/https)
-      MaggotWeb.Endpoint
+      MaggotWeb.Endpoint,
       # Start a worker by calling: MaggotWeb.Worker.start_link(arg)
       # {MaggotWeb.Worker, arg}
+      MaggotWeb.Presence
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

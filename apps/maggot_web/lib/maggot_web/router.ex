@@ -18,6 +18,7 @@ defmodule MaggotWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
+    live "/game/:room_id", GameLive, :index
   end
 
   # Other scopes may use custom stacks.

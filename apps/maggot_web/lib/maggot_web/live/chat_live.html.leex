@@ -1,0 +1,11 @@
+<div id="chat-messages-container">
+messages
+
+</div>
+<div id="chat-input-container">
+    <%= f = form_for :input, "#",
+            phx_submit: "send-message",
+            phx_target: @myself %>
+        <%= text_input f, :message, placeholder: "Enter text..." %>
+    </form>
+</div>

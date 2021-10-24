@@ -50,7 +50,8 @@ defmodule MaggotWeb.MixProject do
       {:gettext, "~> 0.18"},
       {:maggot, in_umbrella: true},
       {:jason, "~> 1.2"},
-      {:plug_cowboy, "~> 2.5"}
+      {:plug_cowboy, "~> 2.5"},
+      { :uuid, "~> 1.1" }
     ]
   end
 

@@ -1,0 +1,30 @@
+<h1>container</h1>
+<div class="container">
+    <div id="game-container">
+    game-container
+    </div>
+    <div id="chat-container">
+    chat-container
+
+    <div id="chat-messages-container" phx-update="append">
+        <%= for message <- @messages do %>
+            <%= if message.type == :system do %>
+                <div id="<%= message.id %>">
+                    <em class="system-message"><%= message.txt %></em>
+                </div>
+            <% else %>
+                <div id="<%= message.id %>">
+                   <strong class="username"><%= message.user %></strong>: <%= message.txt %>
+                </div>
+            <% end %>
+        <% end %>
+    </div>
+    <div id="chat-input-container">
+        <%= f = form_for :input, "#",
+                phx_submit: "send-message" %>
+            <%= text_input f, :message, placeholder: "Enter text..." %>
+        </form>
+    </div>
+
+    </div>
+</div>
