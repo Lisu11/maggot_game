@@ -47,6 +47,12 @@ defmodule MaggotWeb.GameLive do
        |> update_gamers(payload)}
   end
 
+  def gamers_select_options(gamers) do
+    for gamer <- gamers do
+      gamer
+    end
+  end
+
   defp update_gamers(socket, %{joins: j, leaves: l}) do
     assign(socket,
       gamers:

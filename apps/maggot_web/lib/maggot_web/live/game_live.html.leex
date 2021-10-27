@@ -1,35 +1,56 @@
-<h1>container</h1>
-<div class="container">
-    <div id="game-container">
-    game-container
-    </div>
-    <div id="chat-container">
-    chat-container
+<div class="container-fluid bg-success">
+    <div class="row">
 
-    <div id="chat-messages-container" phx-update="append">
-        <%= for message <- @messages do %>
-            <%= if message.type == :system do %>
-                <div id="<%= message.id %>">
-                    <em class="system-message"><%= message.txt %></em>
-                </div>
-            <% else %>
-                <div id="<%= message.id %>">
-                   <strong class="username"><%= message.user %></strong>: <%= message.txt %>
-                </div>
-            <% end %>
-        <% end %>
-    </div>
-    <div id="chat-input-container">
-        <%= f = form_for :input, "#",
-                phx_submit: "send-message" %>
-            <%= text_input f, :message, placeholder: "Enter text..." %>
-        </form>
-    </div>
-    <div id="chat-users-container">
-        <%= for gamer <- @gamers do %>
-            <div> <%= gamer %> </div>
-        <% end %>
+        <div id="game-container" class="col-lg-8 col-12 d-flex">
+
+            <svg class="border border-white flex-grow">
+                <rect width="400" height="100" style="fill:rgb(0,0,255);stroke-width:10;stroke:rgb(0,0,0)" />
+            </svg>
+        </div>
+        <div id="chat-container" class="col-lg-4">
+            <h2>
+                chat-container
+            </h2>
+
+            <div id="messages-container" >
+                <ul class="list-group messages" phx-update="append">
+                    <%= for message <- @messages do %>
+                        <%= if message.type==:system do %>
+                            <li id="<%= message.id %>" class="list-group-item">
+                                <em class="system-message">
+                                    <%= message.txt %>
+                                </em>
+                            </li>
+                        <% else %>
+                            <li id="<%= message.id %>" class="list-group-item">
+                                <strong class="username">
+                                    <%= message.user %>
+                                </strong>: <%= message.txt %>
+                            </li>
+                        <% end %>
+                    <% end %>
+                </ul>
+            </div>
+            <div id="input-container">
+                <%= f=form_for :input, "#" ,
+                         phx_submit: "send-message",
+                         class: "" %>
+                    <%= select f, :send_to,
+                            gamers_select_options(@gamers),
+                            prompt: "Send to all",
+                            class: "form-control" %>
+                    <div class="input-group">
+                        <%= text_input f,
+                                :message,
+                                placeholder: "Enter text...",
+                                class: "form-control" %>
+                        <button class="btn btn-dark">Send</button>
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
     </div>
 
-    </div>
 </div>
