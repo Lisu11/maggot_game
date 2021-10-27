@@ -1,26 +1,38 @@
-<h1>Register</h1>
+<section class="registration bg-light">
+  <h1 class="text-center">Register</h1>
 
-<.form let={f} for={@changeset} action={Routes.user_registration_path(@conn, :create)}>
-  <%= if @changeset.action do %>
-    <div class="alert alert-danger">
-      <p>Oops, something went wrong! Please check the errors below.</p>
+  <div class="container">
+    <div class="row d-flex justify-content-center">
+      <div class="col-6">
+      <.form let={f} for={@changeset} action={Routes.user_registration_path(@conn, :create)} >
+
+        <%= if @changeset.action do %>
+          <div class="alert alert-danger">
+            <p>Oops, something went wrong! Please check the errors below. </p>
+          </div>
+        <% end %>
+        <div class="form-group">
+          <%= label f, :email, class: "form-label" %>
+          <%= email_input f, :email, required: true, class: maybe_invalid_form_control(f, :email) %>
+          <%= error_tag f, :email %>
+        </div>
+        <div class="form-group">
+          <%= label f, :password, class: "form-label" %>
+          <%= password_input f, :password,
+              required: true,
+              class: maybe_invalid_form_control(f, :password) %>
+          <%= error_tag f, :password %>
+        </div>
+
+        <button class="btn btn-dark" type="submit">Register</button>
+
+      </.form>
+
+      <p>
+        <%= link "Log in", to: Routes.user_session_path(@conn, :new) %> |
+        <%= link "Forgot your password?", to: Routes.user_reset_password_path(@conn, :new) %>
+      </p>
     </div>
-  <% end %>
-
-  <%= label f, :email %>
-  <%= email_input f, :email, required: true %>
-  <%= error_tag f, :email %>
-
-  <%= label f, :password %>
-  <%= password_input f, :password, required: true %>
-  <%= error_tag f, :password %>
-
-  <div>
-    <%= submit "Register" %>
+    </div>
   </div>
-</.form>
-
-<p>
-  <%= link "Log in", to: Routes.user_session_path(@conn, :new) %> |
-  <%= link "Forgot your password?", to: Routes.user_reset_password_path(@conn, :new) %>
-</p>
+</section>

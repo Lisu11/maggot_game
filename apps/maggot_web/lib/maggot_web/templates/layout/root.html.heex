@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-   
+
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-  
+
     <%= csrf_meta_tag() %>
     <%= live_title_tag assigns[:page_title] || "Maggot", suffix: " · Phoenix Framework" %>
     <!-- <link phx-track-static rel="stylesheet" href={Routes.static_path(@conn, "/assets/app.css")}/> -->
@@ -18,12 +18,13 @@
   </head>
   <body >
     <nav class="navbar navbar-expand-sm navbar-dark bg-dark sticky-top">
-      <a class="navbar-brand" href="#"><i class="fa fa-transgender-alt fa-6 text-white" aria-hidden="true"></i></a>
+      <a class="navbar-brand" href="#">
+      <i class="fa fa-transgender-alt fa-6 text-white" aria-hidden="true"></i></a>
       <button class="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#collapsibleNavId" aria-controls="collapsibleNavId"
           aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-    
+
       <div class="collapse navbar-collapse" id="collapsibleNavId">
         <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
           <li class="nav-item active">
@@ -40,12 +41,9 @@
             </div>
           </li>
         </ul>
-        <ul class="navbar-nav mt-2 mt-lg-0 pl-5 pr-2 ">
-          <li class="nav-item"><a href="" class="nav-link">Log In</a></li>
-          <li class="nav-item"><a href="" class="nav-link">Register</a></li>
-        </ul>
+        <%= render "_user_menu.html", assigns %>
       </div>
-      <%= render "_user_menu.html", assigns %>
+
     </nav>
     <%= @inner_content %>
     <!-- Optional JavaScript -->
