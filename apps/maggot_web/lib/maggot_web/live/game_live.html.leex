@@ -1,18 +1,18 @@
-<div class="container-fluid bg-success">
-    <div class="row">
+<div class="container-fluid bg-light fill-remaing-height">
+    <div class="row h-100">
 
         <div id="game-container" class="col-lg-8 col-12 d-flex">
 
-            <svg class="border border-white flex-grow">
+            <svg class="border border-dark bg-white flex-grow">
                 <rect width="400" height="100" style="fill:rgb(0,0,255);stroke-width:10;stroke:rgb(0,0,0)" />
             </svg>
         </div>
-        <div id="chat-container" class="col-lg-4 my-2 p-0 mr-auto">
+        <div id="chat-container" class="col-lg-4 my-2 p-0 pr-2 d-flex flex-column">
             <h2 class="bg-primary text-light text-center mb-0 mt-1 rounded">
                Live Chat
             </h2>
 
-            <div id="messages-container" >
+            <div id="messages-container" class="flex-shrink-1 flex-grow-1" >
                 <ul class="list-group messages" phx-update="append">
                     <%= for msg <- @messages do %>
                         <%= render_message msg, @current_user %>
@@ -31,6 +31,7 @@
                     <div class="input-group">
                         <%= text_input f,
                                 :message,
+                                required: true,
                                 placeholder: "Enter text...",
                                 class: "form-control" %>
                         <button class="btn btn-dark">Send</button>
