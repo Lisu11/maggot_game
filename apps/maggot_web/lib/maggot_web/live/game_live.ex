@@ -28,13 +28,9 @@ defmodule MaggotWeb.GameLive do
     end)
   end
 
-  def render_message1(message, assigns) do
-    ~L"""
-      <li id="1"><%= @assigns %></li>
-    """
-  end
-  def render_message(%{type: {:private, to}} = msg, assigns, current_user) do
-    IO.inspect(assigns)
+
+  def render_message(%{type: {:private, to}} = msg, current_user, assigns \\ %{}) do
+    Logger.debug(:maybe_rendering_private_message)
     if current_user.email == to do
       ~L"""
       <li id="<%= msg.id %>" class="list-group-item">
@@ -48,8 +44,8 @@ defmodule MaggotWeb.GameLive do
       """
     end
   end
-  def render_message(%{type: :system} = msg, assigns, current_user) do
-    IO.inspect(2222222)
+  def render_message(%{type: :system} = msg, _current_user, assigns) do
+    Logger.debug(:rendering_system_message)
     ~L"""
     <li id="<%= msg.id %>" class="list-group-item text-info">
         <em class="message-content system-message">
@@ -58,9 +54,8 @@ defmodule MaggotWeb.GameLive do
     </li>
     """
   end
-  def render_message(msg, assigns, current_user) do
-    IO.inspect(msg)
-    IO.inspect(assigns)
+  def render_message(msg, _current_user, assigns) do
+    Logger.debug(:rendering_regular_message)
     ~L"""
     <li id="<%= msg.id %>" class="list-group-item">
       <strong class="username">
@@ -97,7 +92,6 @@ defmodule MaggotWeb.GameLive do
   @impl true
   def handle_info(%{event: "new-message", payload: message}, socket) do
     Logger.info(handle_info: message)
-    Logger.info(handle_info_new_socket: assign_message(socket, message))
 
     { :noreply, assign_message(socket, message)}
   end

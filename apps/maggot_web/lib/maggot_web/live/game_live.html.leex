@@ -15,7 +15,7 @@
             <div id="messages-container" >
                 <ul class="list-group messages" phx-update="append">
                     <%= for msg <- @messages do %>
-                        <%= render_message msg, @socket.assigns, @current_user %>
+                        <%= render_message msg, @current_user %>
 
                     <% end %>
                 </ul>
