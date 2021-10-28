@@ -7,7 +7,9 @@ defmodule MaggotWeb.ChatLive do
   @impl true
   def mount(socket) do
     # IO.inspect(socket)
-    {:ok, assign(socket, :gamers, nil)}
+    {:ok, assign(socket,
+                  gamers: nil,
+                  messages: [])}
   end
 
   @impl true
@@ -66,7 +68,8 @@ defmodule MaggotWeb.ChatLive do
     end
   end
 
-  def render_message(%{type: {:private, to}} = msg, current_user, assigns \\ %{}) do
+  def render_message(msg, current_user, assigns \\ %{})
+  def render_message(%{type: {:private, to}} = msg, current_user, assigns) do
     Logger.debug(maybe_rendering_private_message: msg)
     if current_user.username == to do
       ~L"""

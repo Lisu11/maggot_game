@@ -1,50 +1,34 @@
 defmodule MaggotWeb.GameLive do
-  use MaggotWeb, :live_view
+  use MaggotWeb, :live_component
   require Logger
-  alias MaggotWeb.{Endpoint, Presence}
+  alias MaggotWeb.Endpoint
 
-  @impl true
-  def mount(%{"room_id" => room}, %{"user_token" => token}, socket) do
-    Logger.debug(:mount_socket)
-    topic = "room:" <> room
-    socket = assign_user(socket, token)
-    initial_presence =
-        if connected?(socket) do
-          Endpoint.subscribe(topic)
-          Presence.track(self(), topic, socket.assigns.current_user.username, %{})
-          Presence.list(topic) |> Map.keys() |> MapSet.new()
-        else
-          MapSet.new()
-        end
-    {:ok, assign(socket,
-            topic: topic,
-            raw_message: nil,
-            messages: [],
-            presence_diff: nil,
-            initial_presence: initial_presence)}
+
+  def render_mesh(assigns) do
+
   end
 
-  defp assign_user(socket, token) do
-    assign_new(socket, :current_user, fn ->
-      Maggot.Accounts.get_user_by_session_token(token)
-    end)
+  def handle_event("change-direction", %{"key" => "ArrowRight"}, %{assigns: %{room: room}} = socket) do
+    Logger.debug(change_direction: :right)
+    MaggotEngine.Game.change_direction(room, :e)
+    {:noreply, socket}
   end
-
-  @impl true
-  def handle_info(%{event: "new-message", payload: message}, socket) do
-    Logger.info(handle_info: message)
-
-    { :noreply, assign(socket, :raw_message, message)}
+  def handle_event("change-direction", %{"key" => "ArrowLeft"},  %{assigns: %{room: room}} = socket) do
+    Logger.debug(change_direction: :right)
+    MaggotEngine.Game.change_direction(room, :w)
+    {:noreply, socket}
   end
-  @impl true
-  def handle_info(%{event: "presence_diff", payload: payload}, socket) do
-    {:noreply, assign(socket, :presence_diff, payload)}
+  def handle_event("change-direction", %{"key" => "ArrowUp"},  %{assigns: %{room: room}} = socket) do
+    Logger.debug(change_direction: :up)
+    MaggotEngine.Game.change_direction(room, :n)
+    {:noreply, socket}
   end
-  @impl true
-  def handle_info(:presence_diff_consumed, socket) do
-    Logger.debug(:presence_diff_consumed)
-    {:noreply, assign(socket, :presence_diff, nil)}
+  def handle_event("change-direction", %{"key" => "ArrowDown"},  %{assigns: %{room: room}} = socket) do
+    Logger.debug(change_direction: :down)
+    MaggotEngine.Game.change_direction(room, :s)
+    {:noreply, socket}
   end
+  def handle_event("change-direction", _p, socket), do: {:noreply, socket}
 
 
 end

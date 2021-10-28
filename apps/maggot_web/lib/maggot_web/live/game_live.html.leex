@@ -1,23 +1,18 @@
-<div class="container-fluid bg-light fill-remaing-height">
-    <div class="row h-100">
 
-        <div id="game-container" class="col-lg-8 col-12 d-flex">
-
-            <svg class="border border-dark bg-white flex-grow">
-                <rect width="400" height="100" style="fill:rgb(0,0,255);stroke-width:10;stroke:rgb(0,0,0)" />
-            </svg>
-        </div>
-        <div id="chat-container" class="col-lg-4 my-2 p-0 pr-2 d-flex flex-column">
-            <%= live_component @socket, MaggotWeb.ChatLive,
-                        id: "chat-live",
-                        messages: @messages,
-                        raw_message: @raw_message,
-                        presence_diff: @presence_diff,
-                        initial_presence: @initial_presence,
-                        topic: @topic,
-                        current_user: @current_user %>
-
-        </div>
-    </div>
-
-</div>
+<svg viewBox="0 0 300 100"
+    class="border border-dark bg-white flex-grow"
+    phx-window-keydown="change-direction"
+    phx-target="<%= @myself %>">
+    <%= if @movement do %>
+        <%= for {x, y} <- @movement["+"] do %>
+            <g color="green">
+                <rect x="<%= x %>" y="<%= y %>" width="1" height="1" fill="currentcolor"/>
+            </g>
+        <% end %>
+        <%= for {x, y} <- @movement["-"] do %>
+            <g color="white">
+                <rect x="<%= x %>" y="<%= y %>" width="1" height="1" fill="currentcolor"/>
+            </g>
+        <% end %>
+    <% end %>
+</svg>

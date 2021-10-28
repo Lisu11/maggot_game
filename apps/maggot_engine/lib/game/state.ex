@@ -20,9 +20,16 @@ defmodule MaggotEngine.Game.State do
     %{state | players: players}
   end
 
+  def change_direction(%{players: players} = state, player_pid, direction) do
+    i = Enum.find_index(players, fn p -> p.pid == player_pid end)
+    p = Player.change_direction(Enum.at(players, i), direction)
+    %{state | players: List.update_at(players, i, fn _ -> p end)}
+  end
+
   defp move(state) do
     state.players
       |> Enum.map(&Player.move/1)
+      # |> IO.inspect()
       |> Enum.reduce(
         { @empty_changes, [] },
         fn {c, p}, {acc_cs, acc_ps} ->

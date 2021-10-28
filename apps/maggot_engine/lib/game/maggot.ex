@@ -3,12 +3,13 @@ defmodule MaggotEngine.Game.Maggot do
   defstruct [:segments, :direction, :bugs]
 
   alias __MODULE__
+  require Logger
 
 
   def new({x, y}) do
     %Maggot{
-      segments: [{x, y}, {x+1, y}],
-      direction: :w,
+      segments: [{x, y}, {x-1, y}],
+      direction: :e,
       # len: 2,
       bugs: []
     }
@@ -28,20 +29,35 @@ defmodule MaggotEngine.Game.Maggot do
 
   defp maybe_remove_last(segments, bugs) do
     case Enum.reverse segments do
-      [h | t] ->
-        if h in bugs do
-          {[], Enum.reverse([h | t])}
+      [last | t] ->
+        if last in bugs do
+          {[], Enum.reverse([last | t])}
         else
-          {[h], Enum.reverse(t)}
+          {[last], Enum.reverse(t)}
         end
     end
   end
 
+  def rotate(%Maggot{direction: :n} = m, :e), do: %Maggot{m | direction: :e}
+  def rotate(%Maggot{direction: :n} = m, :w), do: %Maggot{m | direction: :w}
+  def rotate(%Maggot{direction: :s} = m, :e), do: %Maggot{m | direction: :e}
+  def rotate(%Maggot{direction: :s} = m, :w), do: %Maggot{m | direction: :w}
+  def rotate(%Maggot{direction: :e} = m, :n), do: %Maggot{m | direction: :n}
+  def rotate(%Maggot{direction: :e} = m, :s), do: %Maggot{m | direction: :s}
+  def rotate(%Maggot{direction: :w} = m, :n), do: %Maggot{m | direction: :n}
+  def rotate(%Maggot{direction: :w} = m, :s), do: %Maggot{m | direction: :s}
+  def rotate(%Maggot{} = m, _) do
+    Logger.debug(maggot_did_not_change_direction: m)
+    m
+  end
 
   def forward(%Maggot{segments: [h , n | _], direction: d}), do: forward(d, h, n)
   defp forward(:w, {x, y}, {x2, _}) when x <= x2, do: {x-1, y}
-  defp forward(:n, {x, y}, {_, y2}) when y2 <= y, do: {x, y+1}
-  defp forward(:s, {x, y}, {_, y2}) when y2 >= y, do: {x, y-1}
+  defp forward(:n, {x, y}, {_, y2}) when y <= y2, do: {x, y-1}
+  defp forward(:s, {x, y}, {_, y2}) when y >= y2, do: {x, y+1}
   defp forward(:e, {x, y}, {x2, _}) when x >= x2, do: {x+1, y}
-  defp forward( _direction, _head_position, _neck_position), do: :error
+  defp forward( _direction, _head_position, _neck_position) do
+    Logger.debug(forward_error: "MaggotEngine.Game.Maggot.forward")
+    :error
+  end
 end

@@ -1,0 +1,23 @@
+<div class="container-fluid bg-light fill-remaing-height">
+    <div class="row h-100">
+
+        <div id="game-container" class="col-lg-8 col-12 d-flex mt-2">
+            <%= live_component @socket, MaggotWeb.GameLive,
+                        id: "game-live",
+                        movement: @movement,
+                        room: @room %>
+
+        </div>
+        <div id="chat-container" class="col-lg-4 my-2 p-0 pr-2 d-flex flex-column">
+            <%= live_component @socket, MaggotWeb.ChatLive,
+                        id: "chat-live",
+                        raw_message: @raw_message,
+                        presence_diff: @presence_diff,
+                        initial_presence: @initial_presence,
+                        topic: @topic,
+                        current_user: @current_user %>
+
+        </div>
+    </div>
+
+</div>

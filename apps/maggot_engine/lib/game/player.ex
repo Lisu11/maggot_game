@@ -16,4 +16,8 @@ defmodule MaggotEngine.Game.Player do
     {change, maggot} = Maggot.move(p.maggot)
     {change, %Player{p | maggot: maggot} }
   end
+
+  def change_direction(%Player{} = p, direction) do
+    %Player{p | maggot: Maggot.rotate(p.maggot, direction)}
+  end
 end

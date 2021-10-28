@@ -49,6 +49,7 @@ defmodule MaggotWeb.MixProject do
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~> 0.18"},
       {:maggot, in_umbrella: true},
+      {:maggot_engine, in_umbrella: true},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
       { :uuid, "~> 1.1" }

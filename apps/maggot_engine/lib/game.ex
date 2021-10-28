@@ -17,16 +17,30 @@ defmodule MaggotEngine.Game do
   end
 
   @impl true
+  def handle_cast({:move, direction, from}, state) do
+    {:noreply, State.change_direction(state, from, direction)}
+  end
+
+  @impl true
   def handle_info(:tick, state) do
     { :noreply, transform_state_and_notify_players(state) }
   end
 
-  def start_link(_) do
-    GenServer.start_link(__MODULE__, nil)
+
+  def start_link(name) do
+    GenServer.start_link(__MODULE__, nil, name: name)
   end
 
-  def add_player(pid) do
+  def add_player(room_name) do
+    pid = Process.whereis(room_name)
     GenServer.call(pid, :add_player)
+  end
+
+  def change_direction(room_name, direction) when direction in [:n, :e, :s, :w] do
+    pid = Process.whereis(room_name)
+
+    from = self()
+    GenServer.cast(pid, {:move, direction, from})
   end
 
   defp transform_state_and_notify_players(state) do

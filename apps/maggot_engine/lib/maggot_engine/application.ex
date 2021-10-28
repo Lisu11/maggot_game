@@ -10,7 +10,8 @@ defmodule MaggotEngine.Application do
     children = [
       # Starts a worker by calling: MaggotEngine.Worker.start_link(arg)
       # {MaggotEngine.Worker, arg}
-      :poolboy.child_spec(:worker, poolboy_config())
+      # :poolboy.child_spec(:worker, poolboy_config())
+      {DynamicSupervisor, strategy: :one_for_one, name: MaggotEngine}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
