@@ -7,7 +7,7 @@
                 <rect width="400" height="100" style="fill:rgb(0,0,255);stroke-width:10;stroke:rgb(0,0,0)" />
             </svg>
         </div>
-        <div id="chat-container" class="col-lg-4 my-2">
+        <div id="chat-container" class="col-lg-4 my-2 p-0 mr-auto">
             <h2 class="bg-primary text-light text-center mb-0 mt-1 rounded">
                Live Chat
             </h2>
@@ -20,7 +20,7 @@
                     <% end %>
                 </ul>
             </div>
-            <div id="input-container">
+            <div id="input-container border  border-2">
                 <%= f=form_for :input, "#" ,
                          phx_submit: "send-message",
                          class: "" %>

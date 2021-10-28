@@ -36,7 +36,7 @@ defmodule MaggotWeb.GameLive do
       <li id="<%= msg.id %>" class="list-group-item">
         <strong class="username">
             <%= msg.user %>
-        </strong>:
+        </strong> whispers:
         <div class="message-content text-danger">
           <%= msg.txt %>
         </div>
@@ -58,9 +58,7 @@ defmodule MaggotWeb.GameLive do
     Logger.debug(:rendering_regular_message)
     ~L"""
     <li id="<%= msg.id %>" class="list-group-item">
-      <strong class="username">
-          <%= msg.user %>
-      </strong>:
+      <strong class="username"><%= msg.user %></strong> said:
       <div class="message-content">
         <%= msg.txt %>
       </div>
