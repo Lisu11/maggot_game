@@ -11,7 +11,7 @@ defmodule MaggotWeb.GameLive do
     gamers =
         if connected?(socket) do
           Endpoint.subscribe(topic)
-          Presence.track(self(), topic, socket.assigns.current_user.email, %{})
+          Presence.track(self(), topic, socket.assigns.current_user.username, %{})
           Presence.list(topic) |> Map.keys() |> MapSet.new()
         else
           MapSet.new()
@@ -30,8 +30,8 @@ defmodule MaggotWeb.GameLive do
 
 
   def render_message(%{type: {:private, to}} = msg, current_user, assigns \\ %{}) do
-    Logger.debug(:maybe_rendering_private_message)
-    if current_user.email == to do
+    Logger.debug(maybe_rendering_private_message: msg)
+    if current_user.username == to do
       ~L"""
       <li id="<%= msg.id %>" class="list-group-item">
         <strong class="username">
@@ -45,17 +45,18 @@ defmodule MaggotWeb.GameLive do
     end
   end
   def render_message(%{type: :system} = msg, _current_user, assigns) do
-    Logger.debug(:rendering_system_message)
+    Logger.debug(rendering_system_message: msg)
     ~L"""
     <li id="<%= msg.id %>" class="list-group-item text-info">
         <em class="message-content system-message">
+            @<strong class="username"><%= msg.user %></strong>
             <%= msg.txt %>
         </em>
     </li>
     """
   end
   def render_message(msg, _current_user, assigns) do
-    Logger.debug(:rendering_regular_message)
+    Logger.debug(rendering_regular_message: msg)
     ~L"""
     <li id="<%= msg.id %>" class="list-group-item">
       <strong class="username"><%= msg.user %></strong> said:
@@ -73,7 +74,7 @@ defmodule MaggotWeb.GameLive do
       %{id: UUID.uuid4(),
         txt: message,
         type: regular_or_private(to),
-        user: socket.assigns.current_user.email}
+        user: socket.assigns.current_user.username}
     Endpoint.broadcast(socket.assigns.topic, "new-message", message)
 
     {:noreply, socket}
@@ -102,7 +103,7 @@ defmodule MaggotWeb.GameLive do
   end
 
   defp assign_message(socket, %{type: {:private, to}} = msg) do
-    messages = if socket.assigns.current_user.email == to, do: [msg], else: []
+    messages = if socket.assigns.current_user.username == to, do: [msg], else: []
     assign(socket, messages: messages)
   end
   defp assign_message(socket, msg), do: assign(socket, messages: [msg])
@@ -135,18 +136,18 @@ defmodule MaggotWeb.GameLive do
   defp diffs_to_messages(diff, status) do
     diff
       |> Map.keys()
-      |> IO.inspect()
+      # |> IO.inspect()
       |> Enum.map(fn u ->
            %{id: UUID.uuid4(),
-             txt: status_on_message(u, status),
+             txt: status_on_message(status),
              type: :system,
              user: u}
         end)
   end
-  defp status_on_message(username, :joins) do
-    "#{username} has joined the chat"
+  defp status_on_message(:joins) do
+    "has joined the chat"
   end
-  defp status_on_message(username, :leaves) do
-    "#{username} has left the chat"
+  defp status_on_message(:leaves) do
+    "has left the chat"
   end
 end
