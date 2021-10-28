@@ -8,6 +8,7 @@ defmodule Maggot.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
 
+    field :username, :string
     timestamps()
   end
 
@@ -30,15 +31,26 @@ defmodule Maggot.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:email, :password, :username])
     |> validate_email()
     |> validate_password(opts)
+    |> validate_username()
+  end
+
+  defp validate_username(changeset) do
+    changeset
+      |> validate_required([:username])
+      |> validate_format(:username, ~r/^[a-zA-Z_]+[a-zA-Z_0-9]$/,
+                         message: "must start with a letter or _ followed by sequence of letters numbers and _")
+      |> validate_length(:username, max: 32, min: 4)
+      |> unique_constraint(:username)
   end
 
   defp validate_email(changeset) do
     changeset
     |> validate_required([:email])
-    |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
+    |> validate_format(:email, ~r/^[^\s]+@[^\s]+\.[^\s]+$/,
+                      message: "must have the @ sign followed by a domain and no spaces")
     |> validate_length(:email, max: 160)
     |> unsafe_validate_unique(:email, Maggot.Repo)
     |> unique_constraint(:email)

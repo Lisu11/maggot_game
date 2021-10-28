@@ -12,8 +12,17 @@
           </div>
         <% end %>
         <div class="form-group">
+          <%= label f, :username, class: "form-label" %>
+          <%= text_input f, :username,
+              required: true,
+              class: maybe_invalid_form_control(f, :username) %>
+          <%= error_tag f, :username %>
+        </div>
+        <div class="form-group">
           <%= label f, :email, class: "form-label" %>
-          <%= email_input f, :email, required: true, class: maybe_invalid_form_control(f, :email) %>
+          <%= email_input f, :email,
+              required: true,
+              class: maybe_invalid_form_control(f, :email) %>
           <%= error_tag f, :email %>
         </div>
         <div class="form-group">
