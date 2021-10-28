@@ -1,14 +1,32 @@
-<div id="messages-container">
-<ul class="messages list-group">
-    <li class="message list-group-item"></li>
-    <li class="message list-group-item"></li>
-    <li class="message list-group-item"></li>
-</ul>
+<h2 class="bg-primary text-light text-center mb-0 mt-1 rounded">
+    Live Chat
+</h2>
+
+<div id="messages-container" class="flex-shrink-1 flex-grow-1" >
+    <ul class="list-group messages" phx-update="append">
+        <%= for msg <- @messages do %>
+            <%= render_message msg, @current_user %>
+
+        <% end %>
+    </ul>
 </div>
-<div id="chat-input-container">
-    <%= f = form_for :input, "#",
-            phx_submit: "send-message",
-            phx_target: @myself %>
-        <%= text_input f, :message, placeholder: "Enter text..." %>
+<div id="input-container border  border-2">
+    <%= f=form_for :input, "#" ,
+                phx_submit: "send-message",
+                phx_target: @myself,
+                class: "" %>
+        <%= select f, :send_to,
+                gamers_select_options(@gamers),
+                prompt: "Send to all",
+                class: "form-control" %>
+        <div class="input-group">
+            <%= text_input f,
+                    :message,
+                    required: true,
+                    placeholder: "Enter text...",
+                    class: "form-control" %>
+            <button class="btn btn-dark">Send</button>
+        </div>
+
     </form>
 </div>

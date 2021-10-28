@@ -8,37 +8,14 @@
             </svg>
         </div>
         <div id="chat-container" class="col-lg-4 my-2 p-0 pr-2 d-flex flex-column">
-            <h2 class="bg-primary text-light text-center mb-0 mt-1 rounded">
-               Live Chat
-            </h2>
-
-            <div id="messages-container" class="flex-shrink-1 flex-grow-1" >
-                <ul class="list-group messages" phx-update="append">
-                    <%= for msg <- @messages do %>
-                        <%= render_message msg, @current_user %>
-
-                    <% end %>
-                </ul>
-            </div>
-            <div id="input-container border  border-2">
-                <%= f=form_for :input, "#" ,
-                         phx_submit: "send-message",
-                         class: "" %>
-                    <%= select f, :send_to,
-                            gamers_select_options(@gamers),
-                            prompt: "Send to all",
-                            class: "form-control" %>
-                    <div class="input-group">
-                        <%= text_input f,
-                                :message,
-                                required: true,
-                                placeholder: "Enter text...",
-                                class: "form-control" %>
-                        <button class="btn btn-dark">Send</button>
-                    </div>
-
-                </form>
-            </div>
+            <%= live_component @socket, MaggotWeb.ChatLive,
+                        id: "chat-live",
+                        messages: @messages,
+                        raw_message: @raw_message,
+                        presence_diff: @presence_diff,
+                        initial_presence: @initial_presence,
+                        topic: @topic,
+                        current_user: @current_user %>
 
         </div>
     </div>
