@@ -7,27 +7,16 @@
                 <rect width="400" height="100" style="fill:rgb(0,0,255);stroke-width:10;stroke:rgb(0,0,0)" />
             </svg>
         </div>
-        <div id="chat-container" class="col-lg-4">
-            <h2>
-                chat-container
+        <div id="chat-container" class="col-lg-4 my-2">
+            <h2 class="bg-primary text-light text-center mb-0 mt-1 rounded">
+               Live Chat
             </h2>
 
             <div id="messages-container" >
                 <ul class="list-group messages" phx-update="append">
-                    <%= for message <- @messages do %>
-                        <%= if message.type==:system do %>
-                            <li id="<%= message.id %>" class="list-group-item">
-                                <em class="system-message">
-                                    <%= message.txt %>
-                                </em>
-                            </li>
-                        <% else %>
-                            <li id="<%= message.id %>" class="list-group-item">
-                                <strong class="username">
-                                    <%= message.user %>
-                                </strong>: <%= message.txt %>
-                            </li>
-                        <% end %>
+                    <%= for msg <- @messages do %>
+                        <%= render_message msg, @socket.assigns, @current_user %>
+
                     <% end %>
                 </ul>
             </div>

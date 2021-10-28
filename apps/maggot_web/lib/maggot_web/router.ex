@@ -21,7 +21,6 @@ defmodule MaggotWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
-    live "/game/:room_id", GameLive, :index
   end
 
   # Other scopes may use custom stacks.
@@ -75,6 +74,7 @@ defmodule MaggotWeb.Router do
   scope "/", MaggotWeb do
     pipe_through [:browser, :require_authenticated_user]
 
+    live "/game/:room_id", GameLive, :index
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings", UserSettingsController, :update
     get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
