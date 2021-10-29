@@ -17,6 +17,13 @@ defmodule MaggotEngine.Game.State do
     %{state | players: players}
   end
 
+  def update_board(state, changes) do
+    changes.+
+      |> Enum.reduce(
+
+      )
+  end
+
   def change_direction(%{players: players} = state, player_pid, direction) do
     m = Maggot.rotate(players[player_pid], direction)
     %{state | players: Map.replace(players, player_pid, m)}

@@ -1,6 +1,6 @@
 defmodule MaggotEngine.Game.Maggot do
-  @enforce_keys [:segments, :direction]
-  defstruct [:segments, :direction, :bugs]
+  @enforce_keys [:head, :mid_segments, :tail, :direction]
+  defstruct [:head, :mid_segments, :tail, :direction, :bugs]
 
   alias __MODULE__
   alias MaggotEngine.Game.Changes
@@ -12,36 +12,50 @@ defmodule MaggotEngine.Game.Maggot do
     with  true <- validator.(head),
           true <- validator.(tail) do
       %Maggot{
-        segments: [{x, y}, {x-1, y}],
+        head: {x, y},
+        mid_segments: [],
+        tail: {x-1, y},
         direction: :e,
         # len: 2,
-        bugs: []
+        bugs: %{}
       }
     end
   end
 
-  def move(%Maggot{} = maggot) do
-    {deletes, segments} = maybe_remove_last(maggot.segments, maggot.bugs)
-    new_head = forward(maggot)
-    changes = Changes.new([new_head], deletes)
-    {changes, %Maggot{maggot | segments: [new_head | segments]}}
-  end
 
   def eat_bug(%Maggot{} = maggot) do
-    [head | _ ] = maggot.segments
+    [head | _ ] = maggot.mid_segments
     %Maggot{maggot | bugs: [head | maggot.bugs]}
   end
 
-  defp maybe_remove_last(segments, bugs) do
-    case Enum.reverse segments do
-      [last | t] ->
-        if last in bugs do
-          {[], Enum.reverse([last | t])}
-        else
-          {[last], Enum.reverse(t)}
-        end
+
+  def move(%Maggot{mid_segments: [], tail: t} = maggot) do
+    new_head = forward(maggot)
+    if t in maggot.bugs do
+      bugs = Map.delete(maggot.bugs, t)
+      { Changes.new([new_head], []),
+        %Maggot{maggot | bugs: bugs, head: new_head, mid_segments: [maggot.head]}}
+    else
+      { Changes.new([new_head], [t]),
+        %Maggot{maggot | head: new_head, tail: maggot.head}}
     end
   end
+  def move(%Maggot{mid_segments: segments, tail: t} = maggot) do
+    new_head = forward(maggot)
+    if t in maggot.bugs do
+      bugs = Map.delete(maggot.bugs, t)
+      segments = [maggot.head | maggot.mid_segments]
+      { Changes.new([new_head], []),
+        %Maggot{maggot | bugs: bugs, head: new_head, mid_segments: segments}}
+    else
+      [last | rest] = Enum.reverse segments
+      segments = [maggot.head | Enum.reverse(rest)]
+      { Changes.new([new_head], [t]),
+        %Maggot{maggot | head: new_head, mid_segments: segments, tail: last} }
+
+    end
+  end
+
 
   def rotate(%Maggot{direction: :n} = m, :e), do: %Maggot{m | direction: :e}
   def rotate(%Maggot{direction: :n} = m, :w), do: %Maggot{m | direction: :w}
@@ -56,7 +70,8 @@ defmodule MaggotEngine.Game.Maggot do
     m
   end
 
-  def forward(%Maggot{segments: [h , n | _], direction: d}), do: forward(d, h, n)
+  def forward(%Maggot{head: h, mid_segments: [], direction: d, tail: t}), do: forward(d, h, t)
+  def forward(%Maggot{head: h, mid_segments: [n | _], direction: d}), do: forward(d, h, n)
   defp forward(:w, {x, y}, {x2, _}) when x <= x2, do: {x-1, y}
   defp forward(:n, {x, y}, {_, y2}) when y <= y2, do: {x, y-1}
   defp forward(:s, {x, y}, {_, y2}) when y >= y2, do: {x, y+1}

@@ -1,6 +1,6 @@
 defmodule MaggotEngine.Game.Changes do
 
-  def new(pluses, minuses), do: %{"+" => pluses, "-" => minuses}
+  def new(pluses, minuses), do: %{+: pluses, -: minuses}
   def empty_changes, do: new([], [])
 
   def merge_changes(l, r) do

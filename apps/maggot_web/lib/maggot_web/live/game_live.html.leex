@@ -4,12 +4,12 @@
     phx-window-keydown="change-direction"
     phx-target="<%= @myself %>">
     <%= if @movement do %>
-        <%= for {x, y} <- @movement["+"] do %>
+        <%= for {x, y} <- @movement.+ do %>
             <g color="green">
                 <rect x="<%= x %>" y="<%= y %>" width="1" height="1" fill="currentcolor"/>
             </g>
         <% end %>
-        <%= for {x, y} <- @movement["-"] do %>
+        <%= for {x, y} <- @movement.- do %>
             <g color="white">
                 <rect x="<%= x %>" y="<%= y %>" width="1" height="1" fill="currentcolor"/>
             </g>
