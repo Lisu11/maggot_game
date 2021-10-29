@@ -1,13 +1,13 @@
 defmodule MaggotEngine.Game.State do
   alias MaggotEngine.Game.{Board, Player}
-  @empty_changes %{"+" => [], "-" => []}
+  import MaggotEngine.Game.Changes
 
   def new(width, height) do
     board  = Board.new(width, height)
     # player = Player.new(first_player_pid, board)
 
     %{
-      players: [],
+      players: %{},
       bugs:    [],
       board:   board
     }
@@ -21,24 +21,26 @@ defmodule MaggotEngine.Game.State do
   end
 
   def change_direction(%{players: players} = state, player_pid, direction) do
-    i = Enum.find_index(players, fn p -> p.pid == player_pid end)
-    p = Player.change_direction(Enum.at(players, i), direction)
-    %{state | players: List.update_at(players, i, fn _ -> p end)}
+    p = Player.change_direction(players[player_pid], direction)
+    %{state | players: Map.replace(players, player_pid, p)}
   end
 
-  defp move(state) do
+  defp move(state) do # TODO make it run parallel
     state.players
+      |> Map.values()
       |> Enum.map(&Player.move/1)
-      # |> IO.inspect()
       |> Enum.reduce(
-        { @empty_changes, [] },
+        { empty_changes() , %{} },
         fn {c, p}, {acc_cs, acc_ps} ->
-          { Map.merge(acc_cs, c, fn _k, v1, v2 -> v1 ++ v2 end), [p | acc_ps] }
+          { merge_changes(c, acc_cs),
+            Map.put_new(acc_ps, p.pid, p) }
         end)
   end
 
   defp notify_players(changes, players) do
-    Enum.each(players,  &{send(&1.pid, {:change, changes})})
+    players
+      |> Map.keys()
+      |> Enum.map(&send(&1, {:change, changes}))
   end
 
   def update_bugs(_state) do
@@ -47,7 +49,7 @@ defmodule MaggotEngine.Game.State do
 
   def add_player(state, pid) do
     player  = Player.new(pid, state.board)
-    players = [player | state.players]
+    players = Map.put_new(state.players, pid, player)
     %{state | players: players}
   end
 end
