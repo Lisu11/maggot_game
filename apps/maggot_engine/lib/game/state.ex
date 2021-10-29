@@ -1,5 +1,5 @@
 defmodule MaggotEngine.Game.State do
-  alias MaggotEngine.Game.{Board, Player}
+  alias MaggotEngine.Game.{Board, Maggot}
   import MaggotEngine.Game.Changes
 
   def new(width, height) do
@@ -7,7 +7,7 @@ defmodule MaggotEngine.Game.State do
     # player = Player.new(first_player_pid, board)
 
     %{
-      players: %{},
+      players: %{}, # player_pid => maggot
       bugs:    [],
       board:   board
     }
@@ -21,19 +21,18 @@ defmodule MaggotEngine.Game.State do
   end
 
   def change_direction(%{players: players} = state, player_pid, direction) do
-    p = Player.change_direction(players[player_pid], direction)
-    %{state | players: Map.replace(players, player_pid, p)}
+    m = Maggot.rotate(players[player_pid], direction)
+    %{state | players: Map.replace(players, player_pid, m)}
   end
 
   defp move(state) do # TODO make it run parallel
     state.players
-      |> Map.values()
-      |> Enum.map(&Player.move/1)
+      |> Enum.map(fn {pid, m} -> {pid, Maggot.move(m)} end)
       |> Enum.reduce(
         { empty_changes() , %{} },
-        fn {c, p}, {acc_cs, acc_ps} ->
-          { merge_changes(c, acc_cs),
-            Map.put_new(acc_ps, p.pid, p) }
+        fn {p, {c, m}}, {acc_c, acc_m} ->
+          { merge_changes(c, acc_c),
+            Map.put_new(acc_m, p, m) }
         end)
   end
 
@@ -48,8 +47,8 @@ defmodule MaggotEngine.Game.State do
   end
 
   def add_player(state, pid) do
-    player  = Player.new(pid, state.board)
-    players = Map.put_new(state.players, pid, player)
+    maggot  = Maggot.new({5, 5})
+    players = Map.put_new(state.players, pid, maggot)
     %{state | players: players}
   end
 end

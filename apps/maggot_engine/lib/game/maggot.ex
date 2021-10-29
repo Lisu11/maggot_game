@@ -3,6 +3,7 @@ defmodule MaggotEngine.Game.Maggot do
   defstruct [:segments, :direction, :bugs]
 
   alias __MODULE__
+  alias MaggotEngine.Game.Changes
   require Logger
 
 
@@ -18,7 +19,7 @@ defmodule MaggotEngine.Game.Maggot do
   def move(%Maggot{} = maggot) do
     {deletes, segments} = maybe_remove_last(maggot.segments, maggot.bugs)
     new_head = forward(maggot)
-    changes = %{"+" => [new_head], "-" => deletes}
+    changes = Changes.new([new_head], deletes)
     {changes, %Maggot{maggot | segments: [new_head | segments]}}
   end
 
