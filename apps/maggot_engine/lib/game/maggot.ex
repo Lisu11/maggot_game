@@ -79,7 +79,7 @@ defmodule MaggotEngine.Game.Maggot do
   defp forward(:s, {x, y}, {_, y2}) when y >= y2, do: {x, y+1}
   defp forward(:e, {x, y}, {x2, _}) when x >= x2, do: {x+1, y}
   defp forward( _direction, _head_position, _neck_position) do
-    Logger.debug(forward_error: "MaggotEngine.Game.Maggot.forward")
+    Logger.error(forward_error: "MaggotEngine.Game.Maggot.forward")
     :error
   end
 end

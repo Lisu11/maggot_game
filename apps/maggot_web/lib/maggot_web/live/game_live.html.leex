@@ -3,16 +3,18 @@
     class="border border-dark bg-white flex-grow"
     phx-window-keydown="change-direction"
     phx-target="<%= @myself %>">
-    <%= if @movement do %>
-        <%= for {x, y} <- @movement.+ do %>
+    <%= if @board != %{} do %>
+        <%= for {{x, y}, v} <- @board do %>
+            <%= if v == :bug  do%>
+            <g color="red">
+                <rect x="<%= x %>" y="<%= y %>" width="1" height="1" fill="currentcolor"/>
+            </g>
+            <% else %>
             <g color="green">
                 <rect x="<%= x %>" y="<%= y %>" width="1" height="1" fill="currentcolor"/>
             </g>
+            <% end %>
         <% end %>
-        <%= for {x, y} <- @movement.- do %>
-            <g color="white">
-                <rect x="<%= x %>" y="<%= y %>" width="1" height="1" fill="currentcolor"/>
-            </g>
-        <% end %>
+
     <% end %>
 </svg>

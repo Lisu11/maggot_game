@@ -51,7 +51,7 @@ defmodule MaggotWeb.RoomLive do
   end
   @impl true
   def handle_info({:change, changes}, socket) do
-    # Logger.debug(changes: changes)
+    Logger.debug(changes: changes)
     socket = assign(socket, :movement, changes)
     {:noreply, socket}
   end

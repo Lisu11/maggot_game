@@ -3,9 +3,23 @@ defmodule MaggotWeb.GameLive do
   require Logger
   alias MaggotWeb.Endpoint
 
+  def mount(socket) do
+    {:ok, assign(socket, board: %{})}
+  end
 
-  def render_mesh(assigns) do
-
+  def update(assigns, socket) do
+   {:ok,
+    socket
+      |> assign(assigns)
+      |> update_board()}
+  end
+# trzeba zrobic inaczej generowac ID i robic update a nie rysowac wszyystko na nowo
+  defp update_board(%{assigns: %{movement: nil, board: board}} = socket), do: socket
+  defp update_board(%{assigns: %{movement: changes, board: board}} = socket) do
+    {_, board} =  changes.+
+                    |> Map.merge(board)
+                    |> Map.split(Map.keys(changes.-))
+    assign(socket, board: board)
   end
 
   def handle_event("change-direction", %{"key" => "ArrowRight"}, %{assigns: %{room: room}} = socket) do

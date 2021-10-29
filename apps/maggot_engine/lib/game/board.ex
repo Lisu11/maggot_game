@@ -17,6 +17,7 @@ defmodule MaggotEngine.Game.Board do
     x < board.width and x >= 0 and y < board.height and y >= 0 do
     board.coords[{x, y}] == nil
   end
+  def empty_spot(_, _), do: false
 
 
 end

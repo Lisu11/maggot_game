@@ -45,7 +45,8 @@ defmodule MaggotEngine.Game do
 
   defp transform_state_and_notify_players(state) do
     state
-    # |> State.update_bugs() # uncomment this
+      |> State.update_counter()
+      |> State.update_bugs()
       |> State.make_move_and_notify_players()
   end
 
