@@ -53,7 +53,7 @@ defmodule MaggotEngine.Game.State do
     x = :rand.uniform(board.width + 1) - 1
     y = :rand.uniform(board.height + 1) - 1
     try do
-      Maggot.new!({x, y}, board)
+      Maggot.new!({x, y}, &Board.empty_spot(board, &1))
     rescue
       MatchError ->
         random_maggot(board)

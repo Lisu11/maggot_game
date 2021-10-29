@@ -4,14 +4,13 @@ defmodule MaggotEngine.Game.Maggot do
 
   alias __MODULE__
   alias MaggotEngine.Game.Changes
-  alias MaggotEngine.Game.Board
   require Logger
 
 
-  def new!({x, y} = head, %Board{} = board) do
+  def new!({x, y} = head, validator) do
     tail = {x-1, y}
-    with  true <- Board.empty_spot(board, head),
-          true <- Board.empty_spot(board, tail) do
+    with  true <- validator.(head),
+          true <- validator.(tail) do
       %Maggot{
         segments: [{x, y}, {x-1, y}],
         direction: :e,
