@@ -19,19 +19,21 @@ defmodule MaggotEngine.Game.Maggot do
         # len: 2,
         bugs: %{}
       }
+    else
+      false -> raise MatchError
+      error -> error
     end
   end
 
 
-  def eat_bug(%Maggot{} = maggot) do
-    [head | _ ] = maggot.mid_segments
-    %Maggot{maggot | bugs: [head | maggot.bugs]}
+  def eat_bug(%Maggot{bugs: bugs, head: head} = maggot) do
+    %Maggot{maggot | bugs: Map.put_new(bugs, head, true) }
   end
 
 
   def move(%Maggot{mid_segments: [], tail: t} = maggot) do
     new_head = forward(maggot)
-    if t in maggot.bugs do
+    if maggot.bugs[t] do
       bugs = Map.delete(maggot.bugs, t)
       { Changes.new([new_head], []),
         %Maggot{maggot | bugs: bugs, head: new_head, mid_segments: [maggot.head]}}
@@ -42,7 +44,7 @@ defmodule MaggotEngine.Game.Maggot do
   end
   def move(%Maggot{mid_segments: segments, tail: t} = maggot) do
     new_head = forward(maggot)
-    if t in maggot.bugs do
+    if maggot.bugs[t] do
       bugs = Map.delete(maggot.bugs, t)
       segments = [maggot.head | maggot.mid_segments]
       { Changes.new([new_head], []),
