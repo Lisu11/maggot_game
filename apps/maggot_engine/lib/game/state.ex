@@ -3,17 +3,14 @@ defmodule MaggotEngine.Game.State do
   import MaggotEngine.Game.Changes
 
   def new(width, height) do
-    board  = Board.new(width, height)
-    # player = Player.new(first_player_pid, board)
-
     %{
       players: %{}, # player_pid => maggot
       bugs:    [],
-      board:   board
+      board:   Board.new(width, height)
     }
   end
 
-  def move_and_notify(state) do
+  def make_move_and_notify_players(state) do
     {changes, players} = move(state)
     notify_players(changes, players)
 
@@ -47,8 +44,19 @@ defmodule MaggotEngine.Game.State do
   end
 
   def add_player(state, pid) do
-    maggot  = Maggot.new({5, 5})
+    maggot  = random_maggot(state.board)
     players = Map.put_new(state.players, pid, maggot)
     %{state | players: players}
+  end
+
+  defp random_maggot(board) do # it can take long time figure out better solution
+    x = :rand.uniform(board.width + 1) - 1
+    y = :rand.uniform(board.height + 1) - 1
+    try do
+      Maggot.new!({x, y}, board)
+    rescue
+      MatchError ->
+        random_maggot(board)
+    end
   end
 end
