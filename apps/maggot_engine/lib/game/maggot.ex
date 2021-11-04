@@ -25,6 +25,13 @@ defmodule MaggotEngine.Game.Maggot do
     end
   end
 
+  def as_list_fast(%Maggot{head: h, tail: t, mid_segments: seg}) do
+    [h , t | seg]
+  end
+
+  def as_list_accurate(%Maggot{head: h, tail: t, mid_segments: seg}) do
+    [h | seg] ++ [t]
+  end
 
   def eat_bug(%Maggot{bugs: bugs, head: head} = maggot) do
     %Maggot{maggot | bugs: Map.put_new(bugs, head, true) }
@@ -71,6 +78,7 @@ defmodule MaggotEngine.Game.Maggot do
     Logger.debug(maggot_did_not_change_direction: m)
     m
   end
+  def rotate(nil, _), do: {:error, :nil_maggot}
 
   def forward(%Maggot{head: h, mid_segments: [], direction: d, tail: t}), do: forward(d, h, t)
   def forward(%Maggot{head: h, mid_segments: [n | _], direction: d}), do: forward(d, h, n)

@@ -1,8 +1,6 @@
-<h2 class="bg-primary text-light text-center mb-0 mt-1 rounded">
-    Live Chat
-</h2>
 
-<div id="messages-container" class="flex-shrink-1 flex-grow-1" >
+
+<div id="messages-container" class="flex-shrink-1 flex-grow-1 mb-auto" >
     <ul class="list-group messages" phx-update="append">
         <%= for msg <- @messages do %>
             <%= render_message msg, @current_user %>

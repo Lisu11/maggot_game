@@ -1,8 +1,8 @@
 defmodule MaggotEngine.Game do
-  alias MaggotEngine.Game.{State}
+  alias MaggotEngine.Game.{State, Maggot}
   use GenServer
-  @width 100
-  @height 100
+  @width 250
+  @height 150
   @framerate 10
 
   @impl true
@@ -12,13 +12,22 @@ defmodule MaggotEngine.Game do
   end
 
   @impl true
-  def handle_call(:add_player, {from, _}, state) do
-    { :reply, :ok, State.add_player(state, from) }
+  def handle_cast({:subscribe, from}, state) do
+    { :noreply, State.add_stopped_player(state, from) }
   end
 
   @impl true
   def handle_cast({:move, direction, from}, state) do
     {:noreply, State.change_direction(state, from, direction)}
+  end
+  @impl true
+  def handle_call(:join_game, {from, _}, state) do
+    case State.add_player(state, from) do
+      {:ok, state} ->
+        { :reply, :ok, state }
+      {:error, reason} ->
+        { :reply, {:error, reason}, state}
+    end
   end
 
   @impl true
@@ -31,9 +40,14 @@ defmodule MaggotEngine.Game do
     GenServer.start_link(__MODULE__, nil, name: name)
   end
 
-  def add_player(room_name) do
+  def subscribe(room_name) do
     pid = Process.whereis(room_name)
-    GenServer.call(pid, :add_player)
+    GenServer.cast(pid, {:subscribe, self()})
+  end
+
+  def join_game(room_name) do
+    pid = Process.whereis(room_name)
+    GenServer.call(pid, :join_game)
   end
 
   def change_direction(room_name, direction) when direction in [:n, :e, :s, :w] do
@@ -45,9 +59,18 @@ defmodule MaggotEngine.Game do
 
   defp transform_state_and_notify_players(state) do
     state
+      |> State.init_changes()
       |> State.update_counter()
       |> State.update_bugs()
-      |> State.make_move_and_notify_players()
+      |> State.step()
+      # |> State.detect_next_step_collisions()
+      |> State.add_rest_of_the_stopped_maggot_to_changes()
+      |> State.notify_players()
+      # |> State.remove_eaten_bugs()
+      |> State.clear_stopped_players()
+      |> State.update_board()
+      |> State.clear_changes()
+      # |> IO.inspect()
   end
 
   defp schedule_ticks() do

@@ -45,16 +45,20 @@ defmodule MaggotEngineTest.MaggotTest do
     end
 
     test "bugged maggot moved has only changes in '+' part", %{bugged_maggot: maggot}  do
-      {%{+: [_ | _], -: []} , _} = Maggot.move(maggot)
+      {%{+: plus, -: minus} , _} = Maggot.move(maggot)
+      assert minus == %{}
+      assert plus != %{}
     end
 
     test "not-bugged maggot moved has changes in both '+' and '-' part", %{maggot: maggot}  do
-      {%{+: [_ | _], -: [_ | _]} , _} = Maggot.move(maggot)
+      {%{+: plus, -: minus} , _} = Maggot.move(maggot)
+      assert minus != %{}
+      assert plus != %{}
     end
   end
 
   describe "forward/1" do
-
+    @moduletag :capture_log
     test "forward peeking gives you next spot for the maggots head or :error when direction is messed up", %{maggot: maggot} do
       {x, y} = maggot.head
 

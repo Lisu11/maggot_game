@@ -33,7 +33,11 @@ defmodule MaggotWeb.ChatLive do
       %{id: UUID.uuid4(),
         txt: message,
         type: regular_or_private(to),
-        user: socket.assigns.current_user.username}
+        user: socket.assigns.current_user.username,
+        time: Time.utc_now()
+              |> Time.to_string()
+              |> String.split(".")
+              |> List.first()}
     Endpoint.broadcast(socket.assigns.topic, "new-message", message)
 
     {:noreply, socket}
@@ -74,10 +78,12 @@ defmodule MaggotWeb.ChatLive do
     if current_user.username == to do
       ~L"""
       <li id="<%= msg.id %>" class="list-group-item">
+        <div class="list-group-item-heading">
         <strong class="username">
             <%= msg.user %>
         </strong> whispers:
-        <div class="message-content text-danger">
+        </div>
+        <div class="list-group-item-text message-content text-danger">
           <%= msg.txt %>
         </div>
       </li>
@@ -99,8 +105,14 @@ defmodule MaggotWeb.ChatLive do
     Logger.debug(rendering_regular_message: msg)
     ~L"""
     <li id="<%= msg.id %>" class="list-group-item">
-      <strong class="username"><%= msg.user %></strong> said:
-      <div class="message-content">
+      <div class="list-group-item-heading d-flex justify-content-between">
+        <h5 class="message-heading-user d-flex">
+          <div class="username mr-1">@<%= msg.user %></div>
+          <span class="user-said">said:</span>
+        </h5>
+        <small class="message-date"><%= msg.time %></small>
+      </div>
+      <div class="list-group-item-text message-content">
         <%= msg.txt %>
       </div>
     </li>

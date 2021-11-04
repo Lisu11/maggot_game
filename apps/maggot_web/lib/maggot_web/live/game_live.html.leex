@@ -3,6 +3,9 @@
     class="border border-dark bg-white flex-grow"
     phx-window-keydown="change-direction"
     phx-target="<%= @myself %>">
+    <g color="balck">
+        <rect x="0" y="0" width="250" height="150" stroke="currentcolor" fill="white"/>
+    </g>
     <%= if @board != %{} do %>
         <%= for {{x, y}, v} <- @board do %>
             <%= if v == :bug  do%>

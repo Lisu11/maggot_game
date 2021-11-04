@@ -12,9 +12,10 @@ defmodule MaggotWeb.RoomLive do
     initial_presence =
         if connected?(socket) do
           Endpoint.subscribe(topic)
-          Presence.track(self(), topic, socket.assigns.current_user.username, %{})
           MaggotEngine.open_new_room(room_atom)
-          MaggotEngine.Game.add_player(room_atom)
+          MaggotEngine.Game.subscribe(room_atom)
+          Presence.track(self(), topic, socket.assigns.current_user.username, %{})
+          :ok = MaggotEngine.Game.join_game(room_atom)
           Presence.list(topic) |> Map.keys() |> MapSet.new()
         else
           MapSet.new()
@@ -51,9 +52,13 @@ defmodule MaggotWeb.RoomLive do
   end
   @impl true
   def handle_info({:change, changes}, socket) do
-    Logger.debug(changes: changes)
+    # Logger.debug(changes: changes)
     socket = assign(socket, :movement, changes)
-    {:noreply, socket}
+    if changes.stops[self()] do
+      {:noreply, socket |> put_flash(:info, "You've lost")}
+    else
+      {:noreply, socket}
+    end
   end
 
 

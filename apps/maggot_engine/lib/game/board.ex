@@ -13,11 +13,28 @@ defmodule MaggotEngine.Game.Board do
       %Board{width: width, height: height, coords: %{}}
   end
 
-  def empty_spot(board, {x, y}) when
+  def empty_spot(%Board{} = board, {x, y}) when
     x < board.width and x >= 0 and y < board.height and y >= 0 do
     board.coords[{x, y}] == nil
   end
-  def empty_spot(_, _), do: false
+  def empty_spot(%Board{} = _, _), do: false
 
+  def collide(%Board{} = board, {x, y}) when
+    x >= board.width or x < 0 or y >= board.height or y < 0, do: true
+  def collide(%Board{coords: coords} = board, p) do
+    coords[p] not in [nil, :bug]
+  end
+
+  def unset_all(%Board{} = board, points) do
+    points = Map.new(points, &{&1, nil})
+    coords = Map.merge(board.coords, points, fn _k, _v, v -> v end)
+    %Board{board | coords: coords}
+  end
+  def unset(%Board{} = board, point), do: set(board, point)
+  def set(%Board{coords: coords} = board, {_x, _y} = point, to \\ nil)
+    when to in [nil, :bug, :pid] do
+      %Board{board | coords:
+        Map.put(coords, point, to)}
+  end
 
 end
