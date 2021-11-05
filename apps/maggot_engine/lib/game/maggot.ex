@@ -37,7 +37,6 @@ defmodule MaggotEngine.Game.Maggot do
     %Maggot{maggot | bugs: Map.put_new(bugs, head, true) }
   end
 
-
   def move(%Maggot{mid_segments: [], tail: t} = maggot) do
     new_head = forward(maggot)
     if maggot.bugs[t] do

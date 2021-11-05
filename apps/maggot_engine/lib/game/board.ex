@@ -21,7 +21,7 @@ defmodule MaggotEngine.Game.Board do
 
   def collide(%Board{} = board, {x, y}) when
     x >= board.width or x < 0 or y >= board.height or y < 0, do: true
-  def collide(%Board{coords: coords} = board, p) do
+  def collide(%Board{coords: coords}, p) do
     coords[p] not in [nil, :bug]
   end
 
@@ -37,4 +37,7 @@ defmodule MaggotEngine.Game.Board do
         Map.put(coords, point, to)}
   end
 
+  def spot_bugged?(%Board{} = board, {_x, _y} = point) do
+    board[point] == :bug
+  end
 end

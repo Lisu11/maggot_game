@@ -59,18 +59,16 @@ defmodule MaggotEngine.Game do
 
   defp transform_state_and_notify_players(state) do
     state
-      |> State.init_changes()
       |> State.update_counter()
-      |> State.update_bugs()
+      |> State.init_changes()
       |> State.step()
       # |> State.detect_next_step_collisions()
       |> State.add_rest_of_the_stopped_maggot_to_changes()
-      |> State.notify_players()
-      # |> State.remove_eaten_bugs()
       |> State.clear_stopped_players()
       |> State.update_board()
-      |> State.clear_changes()
-      # |> IO.inspect()
+      |> State.update_bugs()
+      |> State.notify_players()
+
   end
 
   defp schedule_ticks() do

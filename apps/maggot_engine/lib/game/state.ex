@@ -1,4 +1,6 @@
 defmodule MaggotEngine.Game.State do
+  # use Constants
+
   alias MaggotEngine.Game.{Board, Maggot}
   alias MaggotEngine.Game.Changes
   require Logger
@@ -9,7 +11,6 @@ defmodule MaggotEngine.Game.State do
     %{
       players: %{}, # player_pid => maggot
       stopped_players: [],
-      bugs:    [],
       board:   Board.new(width, height),
       changes: Changes.empty(),
       counter: 0
@@ -32,20 +33,6 @@ defmodule MaggotEngine.Game.State do
     end
   end
 
-  defp clear_subtracted(%{changes: changes, board: board} = state) do
-    Changes.subtractions(changes)
-      |> Map.keys()
-      |> then(&Board.unset_all(board, &1))
-      |> then(&%{state | board: &1})
-  end
-
-  defp mark_added(%{changes: changes, board: board} = state) do
-    Changes.additions(changes)
-      |> Enum.reduce(board, fn {point, value}, board ->
-          Board.set(board, point, value)
-        end)
-      |> then(&%{state | board: &1})
-  end
 
   def update_counter(%{counter: @bugs_freq} = state), do: %{state | counter: 0}
   def update_counter(%{counter: counter} = state), do: %{state | counter: counter + 1}
@@ -55,13 +42,12 @@ defmodule MaggotEngine.Game.State do
   end
 
   def add_player(%{board: board, players: players, stopped_players: sp} = state, pid) do
-    index =  Enum.find_index(sp, &{&1 == pid})
-    if index do
+    if pid in sp do
       maggot  = random_maggot(board)
       players = Map.put_new(players, pid, maggot)
       { :ok,
         %{state | players: players,
-                stopped_players: List.delete_at(sp, index)}
+                  stopped_players: List.delete(sp, pid)}
       }
     else
       {:error, :subscribe_first}
@@ -69,17 +55,15 @@ defmodule MaggotEngine.Game.State do
 
   end
 
-  def update_bugs(%{counter: 0, bugs: bugs, board: board, changes: changes} = state) do
+  def update_bugs(%{counter: 0, board: board, changes: changes} = state) do
     bug = random_bug(board)
-    %{state | bugs: [bug | bugs], changes: Changes.add_change(changes, :+, {bug, :bug}) }
+    %{state | changes: Changes.add_change(changes, :+, {bug, :bug}),
+              board: Board.set(board, bug, :bug) }
   end
   def update_bugs(state), do: state
 
   def init_changes(state), do: %{state | changes: Changes.empty() }
 
-  def clear_changes(state) do
-    %{state | changes: nil}
-  end
 
   def clear_stopped_players(%{players: players, changes: changes, stopped_players: sp} = state) do
     {stopped, active} = changes
@@ -89,10 +73,6 @@ defmodule MaggotEngine.Game.State do
     %{state | players: active, stopped_players: Map.keys(stopped) ++ sp}
   end
 
-  def remove_eaten_bugs(%{changes: changes, bugs: bugs} = state) do
-    removed = Changes.get_removed_bugs(changes)
-    %{state | bugs: Enum.filter(bugs, &{ &1 not in removed })}
-  end
 
   def step(%{changes: changes} = state) do # TODO make it run parallel
     state.players
@@ -124,6 +104,22 @@ defmodule MaggotEngine.Game.State do
     state
   end
 
+
+  defp clear_subtracted(%{changes: changes, board: board} = state) do
+    Changes.subtractions(changes)
+      |> Map.keys()
+      |> then(&Board.unset_all(board, &1))
+      |> then(&%{state | board: &1})
+  end
+
+  defp mark_added(%{changes: changes, board: board} = state) do
+    Changes.additions(changes)
+      |> Enum.reduce(board, fn {point, value}, board ->
+          Board.set(board, point, value)
+        end)
+      |> then(&%{state | board: &1})
+  end
+
   defp combine_moves_and_changes(collection, changes) do
     Enum.reduce(
       collection,
@@ -136,26 +132,26 @@ defmodule MaggotEngine.Game.State do
       end)
   end
 
-  defp maybe_move_maggot({pid, maggot}, %{bugs: bugs, board: board}) do
+  defp maybe_move_maggot({pid, maggot}, %{board: board}) do
     head = Maggot.forward(maggot)
     cond do
       Board.collide(board, head) ->
-        {pid,
-         {Changes.new({pid, head}),
-          maggot}}
+        { pid,
+          {Changes.new({pid, head}), maggot}}
       true ->
-        {pid, maybe_eat_bug_and_move(maggot, bugs)}
+        { pid,
+          maybe_eat_bug_and_move(maggot, board)}
     end
   end
 
-  defp maybe_eat_bug_and_move(maggot, bugs) do
+  defp maybe_eat_bug_and_move(maggot, board) do
     head = Maggot.forward(maggot)
-    if head in bugs do
+    if Board.spot_bugged?(board, head) do
       maggot
         |> Maggot.move()
-        |> then(fn {c, m} ->
-            c = Changes.add_change(c, :-, {head, :bug})
-            {c, Maggot.eat_bug(m)}
+        |> then(fn {%Changes{} = c, %Maggot{} = m} ->
+            { Changes.add_change(c, :-, {head, :bug}),
+              Maggot.eat_bug(m)}
            end)
     else
       Maggot.move(maggot)

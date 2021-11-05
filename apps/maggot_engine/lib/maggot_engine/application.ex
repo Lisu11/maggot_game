@@ -20,13 +20,13 @@ defmodule MaggotEngine.Application do
     Supervisor.start_link(children, opts)
   end
 
-  defp poolboy_config do
-    [
-      name: {:local, :worker},
-      worker_module: MaggotEngine.Game,
-      size: 1,
-      max_overflow: 2
-    ]
-  end
+  # defp poolboy_config do
+  #   [
+  #     name: {:local, :worker},
+  #     worker_module: MaggotEngine.Game,
+  #     size: 1,
+  #     max_overflow: 2
+  #   ]
+  # end
 
 end
