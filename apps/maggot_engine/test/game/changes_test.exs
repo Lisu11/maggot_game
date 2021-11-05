@@ -24,8 +24,8 @@ defmodule MaggotEngineTest.ChangesTest do
 
   describe "new/1" do
     test "should create new changes with one stopped map", %{pid: pid} do
-      c = Changes.new({pid, {1,1}})
-      assert c.stops[pid] == {1,1}
+      c = Changes.new(pid)
+      assert c.stops[pid]
     end
   end
 

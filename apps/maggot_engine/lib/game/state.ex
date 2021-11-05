@@ -41,6 +41,10 @@ defmodule MaggotEngine.Game.State do
     %{state | stopped_players: [pid | sp]}
   end
 
+  def remove_stopped_player(%{stopped_players: sp} = state, pid) do
+    %{state | stopped_players: List.delete(sp, pid)}
+  end
+
   def add_player(%{board: board, players: players, stopped_players: sp} = state, pid) do
     if pid in sp do
       maggot  = random_maggot(board)
@@ -53,6 +57,12 @@ defmodule MaggotEngine.Game.State do
       {:error, :subscribe_first}
     end
 
+  end
+
+  def remove_player(%{players: players, stopped_players: sp, changes: changes} = state, pid) do
+    %{state | players: Map.delete(players, pid),
+              stopped_players: [pid | sp],
+              changes: Changes.merge(changes, Changes.new(pid))}
   end
 
   def update_bugs(%{counter: 0, board: board, changes: changes} = state) do
@@ -73,6 +83,12 @@ defmodule MaggotEngine.Game.State do
     %{state | players: active, stopped_players: Map.keys(stopped) ++ sp}
   end
 
+  def detect_next_step_collisions(state) do
+    state
+      |> get_pids_for_same_heads()
+      |> stop_colliding_pids(state)
+  end
+
 
   def step(%{changes: changes} = state) do # TODO make it run parallel
     state.players
@@ -86,7 +102,7 @@ defmodule MaggotEngine.Game.State do
 
   def add_rest_of_the_stopped_maggot_to_changes(%{changes: changes, players: players} = state) do
     Changes.stops(changes)
-      |> Enum.map(fn {pid, _head} ->
+      |> Enum.map(fn pid ->
           Maggot.as_list_fast(players[pid]) end)
       |> Enum.reduce(changes, fn points, changes ->
           Changes.new([], points)
@@ -104,6 +120,18 @@ defmodule MaggotEngine.Game.State do
     state
   end
 
+  defp get_pids_for_same_heads(%{players: players}) do
+    repetitions = players
+              |> Enum.map(fn {_k, v} -> v.head end)
+              |> then(&(&1 -- Enum.uniq(&1)))
+
+    Enum.filter(players, fn {_k, v} -> v.head in repetitions end)
+  end
+
+  defp stop_colliding_pids([], state), do: state
+  defp stop_colliding_pids([{pid, _} | ps], state) do
+     stop_colliding_pids(ps, remove_player(state, pid))
+  end
 
   defp clear_subtracted(%{changes: changes, board: board} = state) do
     Changes.subtractions(changes)
@@ -137,7 +165,7 @@ defmodule MaggotEngine.Game.State do
     cond do
       Board.collide(board, head) ->
         { pid,
-          {Changes.new({pid, head}), maggot}}
+          {Changes.new(pid), maggot}}
       true ->
         { pid,
           maybe_eat_bug_and_move(maggot, board)}

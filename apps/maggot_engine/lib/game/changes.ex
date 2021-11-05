@@ -17,8 +17,8 @@ defmodule MaggotEngine.Game.Changes do
       -: Map.new(minuses, &transform(&1, :bug))
      }
   end
-  def new({pid, head}) do
-    %Changes{stops: %{pid => head}}
+  def new(pid) do
+    %Changes{stops: %{pid => true}}
   end
 
   def add_change(%Changes{} = changes, :+, {k, v}) do

@@ -153,18 +153,62 @@ defmodule MaggotEngineTest.StateTest do
 
   end
   describe "update_bugs/1" do
-    test "pass" do
-      # TODO
-      IO.puts(:IMPLEMENT_ME)
+    setup %{state: state} do
+      # update_bugs needs to be called AFTER update_board
+      # data in board and in changes need to be already synchronized
+      state = State.update_board(state)
+      [state: state]
+    end
+
+    test "for non-zero counter should return state unchanged",
+      %{state: state} do
+        state = %{state | counter: :rand.uniform(100)}
+        assert State.update_bugs(state) === state
+    end
+
+    test "when counter in state is zero new bug should appear in changes as well as in board",
+      %{state: state} do
+        up_state = State.update_bugs(state)
+
+        assert state.changes.- === up_state.changes.-
+        assert state.changes.stops === up_state.changes.stops
+
+        assert state.changes.+ !== up_state.changes.+
+        [{new_bug, :bug}] =
+          up_state.changes.+
+          |> Map.to_list()
+          |> Kernel.--(Map.to_list(state.changes.+))
+
+        assert state.board.coords[new_bug] == nil
+        assert up_state.board.coords[new_bug] == :bug
+    end
+
+    test "when counter in state is zero nothing except board and changes should mutate",
+      %{state: state} do
+        up_state = State.update_bugs(state)
+        for key <- Map.keys(state),
+          key not in [:changes, :board] do
+            assert up_state[key] === state[key]
+        end
     end
 
   end
+
   describe "clear_stopped_players/1" do
-    test "pass" do
-      # TODO
-      IO.puts(:IMPLEMENT_ME)
+    test "when nothing is stopped in changes then state stay unchanged",
+      %{state: state} do
+      up_state = State.clear_stopped_players(state)
+
+      assert up_state === state
     end
 
+    test "when stops in changes is nonempty move appropriate active players to stopped_players",
+      %{state: state} do
+        IO.puts(:IMPLEMENT_ME)
+        # changes = Changes.merge(state.changes, Changes.new())
+        #  state = %{state | changes: }
+
+    end
   end
 
   describe "init_changes/1" do
@@ -226,14 +270,14 @@ defmodule MaggotEngineTest.StateTest do
 
 
 
-  defp gen_random_changes(w, h) do
+  defp gen_random_changes(w, h, whats \\  [:bug, :pid]) do
     count_add = :rand.uniform(w * h)
     count_sub = :rand.uniform(w * h)
 
     adds = for _ <- 1..count_add do
       x = :rand.uniform(w - 1)
       y = :rand.uniform(h - 1)
-      what = [:bug, :pid]
+      what = whats
               |> Enum.take_random(1)
               |> List.first()
       {{x, y}, what}

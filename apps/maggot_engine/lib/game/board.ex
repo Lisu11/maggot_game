@@ -38,6 +38,6 @@ defmodule MaggotEngine.Game.Board do
   end
 
   def spot_bugged?(%Board{} = board, {_x, _y} = point) do
-    board[point] == :bug
+    board.coords[point] == :bug
   end
 end
