@@ -6,7 +6,7 @@
     <%= @game_state %>
     </div>
     <%= live_patch "Give up",
-                to: Routes.live_path(@socket, MaggotWeb.RoomLive, @room_id, game_action: :join),
+                to: Routes.live_path(@socket, MaggotWeb.RoomLive, @room_id, game_action: :give_up),
                 class: "btn btn-danger btn-lg " <> control_class_for_state :give_up, @game_state  %>
 </div>
 <div id="chat-container" class="card  mt-2 p-0 pr-2 d-flex flex-column">

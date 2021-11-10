@@ -56,6 +56,11 @@ defmodule MaggotWeb.RoomLive do
   end
 
   @impl true
+  def handle_params(%{"game_action" => "give_up"}, _uri, socket) do
+    MaggotEngine.Game.kill_me(socket.assigns.room)
+    { :noreply, assign(socket, game_state: :playing) }
+  end
+  @impl true
   def handle_params(%{"game_action" => "join"}, _uri, socket) do
     { :noreply,
       with :ok <- MaggotEngine.Game.join_game(socket.assigns.room) do

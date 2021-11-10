@@ -5,7 +5,8 @@
             <%= live_component @socket, MaggotWeb.GameLive,
                         id: "game-live",
                         movement: @movement,
-                        room: @room %>
+                        room: @room,
+                        game_state: @game_state %>
 
         </div>
         <div class="col-lg-4">

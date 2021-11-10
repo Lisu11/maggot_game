@@ -22,27 +22,18 @@ defmodule MaggotWeb.GameLive do
     assign(socket, board: board)
   end
 
-  def handle_event("change-direction", %{"key" => "ArrowRight"}, %{assigns: %{room: room}} = socket) do
-    Logger.debug(change_direction: :right)
-    MaggotEngine.Game.change_direction(room, :e)
-    {:noreply, socket}
-  end
-  def handle_event("change-direction", %{"key" => "ArrowLeft"},  %{assigns: %{room: room}} = socket) do
-    Logger.debug(change_direction: :right)
-    MaggotEngine.Game.change_direction(room, :w)
-    {:noreply, socket}
-  end
-  def handle_event("change-direction", %{"key" => "ArrowUp"},  %{assigns: %{room: room}} = socket) do
-    Logger.debug(change_direction: :up)
-    MaggotEngine.Game.change_direction(room, :n)
-    {:noreply, socket}
-  end
-  def handle_event("change-direction", %{"key" => "ArrowDown"},  %{assigns: %{room: room}} = socket) do
-    Logger.debug(change_direction: :down)
-    MaggotEngine.Game.change_direction(room, :s)
+  def handle_event("change-direction", %{"key" => arrow}, %{assigns: %{room: room, game_state: :playing}} = socket)
+    when arrow in ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"] do
+    Logger.debug(change_direction: arrow)
+
+    MaggotEngine.Game.change_direction(room, arrow_to_direction(arrow))
     {:noreply, socket}
   end
   def handle_event("change-direction", _p, socket), do: {:noreply, socket}
 
+  defp arrow_to_direction("ArrowRight"), do: :e
+  defp arrow_to_direction("ArrowLeft"), do: :w
+  defp arrow_to_direction("ArrowUp"), do: :n
+  defp arrow_to_direction("ArrowDown"), do: :s
 
 end
