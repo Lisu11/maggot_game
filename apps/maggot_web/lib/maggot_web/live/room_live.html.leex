@@ -8,62 +8,16 @@
                         room: @room %>
 
         </div>
-        <div id="chat-container" class="card col-lg-4 mt-2 p-0 pr-2 d-flex flex-column">
-            <div class="card-header mb-0">
-                <ul class="nav nav-pills card-header-tabs " id="pills-tab" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <%# <h2 class="bg-primary text-light text-center mb-0 mt-1 rounded"> %>
-                            <a class="nav-link active"
-                            id="pills-chat-tab"
-                            data-toggle="pill"
-                            href="#pills-chat"
-                            role="tab" aria-controls="pills-chat"
-                            aria-selected="true">
-                                Live Chat
-                            </a>
-                        <%# </h2> %>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <a class="nav-link"
-                            id="pills-users-tab"
-                            data-toggle="pill"
-                            href="#pills-users"
-                            role="tab"
-                            aria-controls="pills-users"
-                            aria-selected="false">
-                                Users
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <div class="card-body tab-content" id="pills-tabContent">
-                <div class="tab-pane fade show active d-flex flex-column justify-content-between h-100"
-                    id="pills-chat"
-                    role="tabpanel"
-                    aria-labelledby="pills-chat-tab">
-
-                        <%= live_component @socket, MaggotWeb.ChatLive,
-                                    id: "chat-live",
-                                    raw_message: @raw_message,
-                                    presence_diff: @presence_diff,
-                                    initial_presence: @initial_presence,
-                                    topic: @topic,
-                                    current_user: @current_user %>
-
-
-                </div>
-                <div class="tab-pane fade"
-                    id="pills-users"
-                    role="tabpanel"
-                    aria-labelledby="pills-users-tab">
-                        <%= live_component @socket, MaggotWeb.UsersListLive,
-                                    id: "users-live",
-                                    presence_diff: @presence_diff,
-                                    initial_presence: @initial_presence,
-                                    topic: @topic,
-                                    current_user: @current_user %>
-                </div>
-            </div>
+        <div class="col-lg-4">
+            <%= live_component @socket, MaggotWeb.MenuLiveComponent,
+                        id: "menu-live",
+                        game_state: @game_state,
+                        room_id: @room_id,
+                        raw_message: @raw_message,
+                        presence_diff: @presence_diff,
+                        presence: @presence,
+                        topic: @topic,
+                        current_user: @current_user %>
         </div>
     </div>
 

@@ -1,0 +1,66 @@
+<div id="menu-controls-container" class="mt-2 d-flex justify-content-between">
+    <%= live_patch "Join Game",
+                to: Routes.live_path(@socket, MaggotWeb.RoomLive, @room_id, game_action: :join),
+                class: "btn btn-success btn-lg " <> control_class_for_state :join, @game_state %>
+    <div>
+    <%= @game_state %>
+    </div>
+    <%= live_patch "Give up",
+                to: Routes.live_path(@socket, MaggotWeb.RoomLive, @room_id, game_action: :join),
+                class: "btn btn-danger btn-lg " <> control_class_for_state :give_up, @game_state  %>
+</div>
+<div id="chat-container" class="card  mt-2 p-0 pr-2 d-flex flex-column">
+    <div class="card-header mb-0">
+        <ul class="nav nav-pills card-header-tabs " >
+            <li class="nav-item" role="presentation">
+                    <div class="nav-link <%= @tab.chat.nav %>"
+                            id="pills-chat-tab"
+                            type="submit"
+                            phx-target="<%= @myself %>"
+                            phx-click="change-nav"
+                            phx-value-tab="chat">
+                        Live Chat
+                    </div>
+
+
+            </li>
+            <li class="nav-item" role="presentation">
+                    <div class="nav-link nav-link-dark <%= @tab.users.nav %>"
+                            id="pills-users-tab"
+                            type="submit"
+                            phx-target="<%= @myself %>"
+                            phx-click="change-nav"
+                            phx-value-tab="users">
+                        Users
+                    </div>
+            </li>
+        </ul>
+    </div>
+    <div class="card-body tab-content" id="pills-tabContent">
+        <div class="tab-pane fade <%= @tab.chat.pane %> d-flex flex-column justify-content-between h-100"
+            id="pills-chat"
+            role="tabpanel"
+            aria-labelledby="pills-chat-tab">
+
+                <%= live_component @socket, MaggotWeb.ChatLive,
+                            id: "chat-live",
+                            raw_message: @raw_message,
+                            presence_diff: @presence_diff,
+                            presence: @presence,
+                            topic: @topic,
+                            current_user: @current_user %>
+
+
+        </div>
+        <div class="tab-pane fade <%= @tab.users.pane %>"
+            id="pills-users"
+            role="tabpanel"
+            aria-labelledby="pills-users-tab">
+                <%= live_component @socket, MaggotWeb.UsersListLive,
+                            id: "users-live",
+                            presence: @presence,
+                            topic: @topic,
+                            current_user: @current_user %>
+        </div>
+    </div>
+</div>

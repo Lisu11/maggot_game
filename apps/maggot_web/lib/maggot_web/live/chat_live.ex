@@ -17,7 +17,7 @@ defmodule MaggotWeb.ChatLive do
     socket
     #  |> IO.inspect()
      |> assign(assigns)
-     |> assign_gamers(assigns.initial_presence)
+     |> assign_gamers(assigns.presence)
     #  |> IO.inspect()
      |> parse_message(assigns.raw_message, assigns.current_user)
     #  |> IO.inspect()
@@ -59,12 +59,6 @@ defmodule MaggotWeb.ChatLive do
     if msg, do: assign(socket, messages: [msg]), else: socket
   end
 
-  defp parse_diff(socket, nil), do: socket
-  defp parse_diff(socket, diff) do
-    socket
-      |> update_presence(diff)
-      |> update_gamers(diff)
-  end
 
   def gamers_select_options(gamers) do
     for gamer <- gamers do
@@ -124,17 +118,8 @@ defmodule MaggotWeb.ChatLive do
   end
   defp assign_gamers(socket, _), do: socket
 
-  defp update_gamers(socket, %{joins: j, leaves: l}) do
-    assign(socket,
-      gamers:
-        Map.keys(j)
-          # |> IO.inspect()
-          |> MapSet.new()
-          |> MapSet.union(socket.assigns.gamers)
-          |> MapSet.difference(MapSet.new(Map.keys(l))))
-  end
-
-  defp update_presence(socket, payload) do
+  defp parse_diff(socket, nil), do: socket
+  defp parse_diff(socket, payload) do
     messages = socket.assigns.messages
     [j_msgs, l_msgs] =
       for {status, diffs} <- payload do
