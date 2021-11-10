@@ -21,16 +21,16 @@ defmodule MaggotEngine.Game.Changes do
     %Changes{stops: %{pid => true}}
   end
 
-  def add_change(%Changes{} = changes, :+, {k, v}) do
-      updated = Map.put_new(additions(changes), k, v)
+  def add_change(%Changes{} = changes, :+, {k, v})  do
+      updated = Map.put_new(changes.+, k, v)
       %Changes{changes | +: updated}
   end
   def add_change(%Changes{} = changes, :-, {k, v}) do
       updated = Map.put_new(subtractions(changes), k, v)
       %Changes{changes | -: updated}
   end
-  def add_change(%Changes{} = changes, :stops, {k, v}) do
-      updated = Map.put_new(stops(changes), k, v)
+  def add_change(%Changes{} = changes, :stops, pid) do
+      updated = Map.put_new(changes.stops, pid, true)
       %Changes{changes | stops: updated}
   end
 

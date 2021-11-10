@@ -77,7 +77,7 @@ defmodule MaggotEngine.Game do
       |> State.update_counter()
       |> State.init_changes()
       |> State.step()
-      |> State.detect_next_step_collisions()
+      |> State.detect_next_step_collisions() # needs to be called AFTER step
       |> State.add_rest_of_the_stopped_maggot_to_changes()
       |> State.clear_stopped_players()
       |> State.update_board()

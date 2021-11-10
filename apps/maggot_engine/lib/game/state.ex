@@ -92,7 +92,7 @@ defmodule MaggotEngine.Game.State do
 
   def step(%{changes: changes} = state) do # TODO make it run parallel
     state.players
-      |> Stream.filter(&elem(&1, 1))
+      # |> Stream.filter(&elem(&1, 1))
       |> Enum.map(&maybe_move_maggot(&1, state))
       |> combine_moves_and_changes(changes)
       |> then(fn {c, p} ->
@@ -102,13 +102,12 @@ defmodule MaggotEngine.Game.State do
 
   def add_rest_of_the_stopped_maggot_to_changes(%{changes: changes, players: players} = state) do
     Changes.stops(changes)
-      |> Enum.map(fn pid ->
-          Maggot.as_list_fast(players[pid]) end)
+      |> Enum.map(fn {pid, true} ->
+        Maggot.as_list_fast(players[pid]) end)
       |> Enum.reduce(changes, fn points, changes ->
           Changes.new([], points)
             |> Changes.merge(changes)
         end)
-      # |> IO.inspect()
       |> then(&%{state | changes: Changes.merge(&1, changes)})
   end
 
@@ -128,9 +127,15 @@ defmodule MaggotEngine.Game.State do
     Enum.filter(players, fn {_k, v} -> v.head in repetitions end)
   end
 
-  defp stop_colliding_pids([], state), do: state
-  defp stop_colliding_pids([{pid, _} | ps], state) do
-     stop_colliding_pids(ps, remove_player(state, pid))
+
+  defp stop_colliding_pids(ps, %{changes: changes} = state) when is_list(ps) do
+    changes = ps
+      |> Enum.map(&elem(&1, 0))
+      |> Enum.reduce(changes, fn pid, chs ->
+          Changes.add_change(chs, :stops, pid)
+        end)
+
+    %{state | changes: changes}
   end
 
   defp clear_subtracted(%{changes: changes, board: board} = state) do
