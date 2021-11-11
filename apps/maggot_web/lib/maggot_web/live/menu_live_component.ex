@@ -17,19 +17,20 @@ defmodule MaggotWeb.MenuLiveComponent do
   end
 
   defp assign_nav(socket) do
-    assign(socket, tab: active_nav(:chat))
+    assign(socket, tab: "chat")
   end
 
   @impl true
   def handle_event("change-nav", %{"tab" => tab}, socket) do
+    # active_nav(String.to_existing_atom(tab))
     { :noreply,
-      assign(socket, tab: active_nav(String.to_existing_atom(tab)))}
+      assign(socket, tab: tab)}
   end
 
   defp active_nav(tab) do
     nav = %{chat: deactivated(), users: deactivated()}
     %{nav | tab =>
-        %{nav: "active", pane: "show"}}
+        %{nav: "active", pane: "show active"}}
   end
   defp deactivated do
     %{nav: "", pane: ""}

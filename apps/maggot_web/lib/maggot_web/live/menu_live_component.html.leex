@@ -13,7 +13,7 @@
     <div class="card-header mb-0">
         <ul class="nav nav-pills card-header-tabs " >
             <li class="nav-item" role="presentation">
-                    <div class="nav-link <%= @tab.chat.nav %>"
+                    <div class="nav-link <%= if @tab == "chat", do: "active", else: "" %>"
                             id="pills-chat-tab"
                             type="submit"
                             phx-target="<%= @myself %>"
@@ -25,7 +25,7 @@
 
             </li>
             <li class="nav-item" role="presentation">
-                    <div class="nav-link nav-link-dark <%= @tab.users.nav %>"
+                    <div class="nav-link nav-link-dark <%= if @tab == "users", do: "active", else: "" %>"
                             id="pills-users-tab"
                             type="submit"
                             phx-target="<%= @myself %>"
@@ -37,29 +37,33 @@
         </ul>
     </div>
     <div class="card-body tab-content" id="pills-tabContent">
-        <div class="tab-pane fade <%= @tab.chat.pane %> d-flex flex-column justify-content-between h-100"
-            id="pills-chat"
-            role="tabpanel"
-            aria-labelledby="pills-chat-tab">
 
-                <%= live_component @socket, MaggotWeb.ChatLive,
-                            id: "chat-live",
-                            raw_message: @raw_message,
-                            presence: @presence,
-                            topic: @topic,
-                            current_user: @current_user %>
+            <div class="tab-pane fade <%= if @tab == "chat", do: "show d-block", else: "d-none" %> "
+                id="pills-chat"
+                role="tabpanel"
+                aria-labelledby="pills-chat-tab">
+                    <div class="d-flex flex-column justify-content-between h-100">
+                    <%= live_component @socket, MaggotWeb.ChatLive,
+                                id: "chat-live",
+                                raw_message: @raw_message,
+                                presence: @presence,
+                                topic: @topic,
+                                current_user: @current_user %>
+                    </div>
+            </div>
 
+            <div class="tab-pane fade <%= if @tab == "users", do: "show d-block", else: "d-none" %>"
+                id="pills-users"
+                role="tabpanel"
+                aria-labelledby="pills-users-tab">
+                 <div class="d-flex flex-column justify-content-between h-100">
+                    <%= live_component @socket, MaggotWeb.UsersListLive,
+                                id: "users-live",
+                                presence: @presence,
+                                topic: @topic,
+                                current_user: @current_user %>
+                </div>
+            </div>
 
-        </div>
-        <div class="tab-pane fade <%= @tab.users.pane %>"
-            id="pills-users"
-            role="tabpanel"
-            aria-labelledby="pills-users-tab">
-                <%= live_component @socket, MaggotWeb.UsersListLive,
-                            id: "users-live",
-                            presence: @presence,
-                            topic: @topic,
-                            current_user: @current_user %>
-        </div>
     </div>
 </div>

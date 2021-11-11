@@ -1,12 +1,12 @@
 <div id="users-container" class="flex-shrink-1 flex-grow-1" >
     <ul class="list-group users" phx-update="append">
-        <%= for user <- [] do %>
+        <%= for user <- @presence do %>
             <li class="list-group-item d-flex justify-content-between align-items-start"
-                id="user-id-<%= user.username%>">
+                id="user-id-<%= user%>">
                 <div class="username">
-                    <%= user.username %>
+                    <%= user %>
                 </div>
-                <span class="badge bg-primary rounded-pill"><%= user.points %></span>
+                <span class="badge bg-primary rounded-pill"><%= 0 %></span>
             </li>
         <% end %>
     </ul>
