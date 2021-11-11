@@ -19,6 +19,7 @@ defmodule MaggotWeb.RoomLive do
             room_id: room,
             raw_message: nil,
             movement: nil,
+            head: {500,500},
             presence_diff: nil)}
   end
 
@@ -43,9 +44,11 @@ defmodule MaggotWeb.RoomLive do
     {:noreply, assign(socket, :presence_diff, nil)}
   end
   @impl true
-  def handle_info({:change, changes}, socket) do
+  def handle_info({:move, %{changes: changes, head: head}}, socket) do
     # Logger.debug(changes: changes)
-    socket = assign(socket, :movement, changes)
+    socket = socket
+       |> assign(movement: changes)
+       |> assign(head: head)
     if changes.stops[self()] do
       {:noreply, socket
         |> put_flash(:info, "You've lost")

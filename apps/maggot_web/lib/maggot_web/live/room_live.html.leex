@@ -1,10 +1,11 @@
 <div class="container-fluid bg-light fill-remaing-height">
     <div class="row h-100">
 
-        <div id="game-container" class="col-lg-8 col-12 d-flex mt-2">
+        <div id="game-container" class="col-lg-8 col-12 d-flex mt-2 mb-0">
             <%= live_component @socket, MaggotWeb.GameLive,
                         id: "game-live",
                         movement: @movement,
+                        head: @head,
                         room: @room,
                         game_state: @game_state %>
 
