@@ -3,6 +3,7 @@ defmodule MaggotWeb.GameLive do
   require Logger
   alias MaggotWeb.Endpoint
 
+  @impl true
   def mount(socket) do
     {:ok, assign(socket,
             board: %{},
@@ -12,6 +13,7 @@ defmodule MaggotWeb.GameLive do
             window_h: 200)}
   end
 
+  @impl true
   def update(assigns, socket) do
    {:ok,
     socket
@@ -21,6 +23,7 @@ defmodule MaggotWeb.GameLive do
 
 
 
+  @impl true
   def handle_event("change-direction",
                    %{"key" => arrow},
                    %{assigns: %{room: room, game_state: :playing}} = socket)
@@ -30,6 +33,7 @@ defmodule MaggotWeb.GameLive do
     MaggotEngine.Game.change_direction(room, arrow_to_direction(arrow))
     {:noreply, socket}
   end
+  @impl true
   def handle_event("change-direction", _p, socket), do: {:noreply, socket}
 
   defp arrow_to_direction("ArrowUp"),    do: :n
@@ -38,7 +42,7 @@ defmodule MaggotWeb.GameLive do
   defp arrow_to_direction("ArrowRight"), do: :e
 
   # trzeba zrobic inaczej generowac ID i robic update a nie rysowac wszyystko na nowo
-  defp update_board(%{assigns: %{movement: nil, board: board}} = socket), do: socket
+  defp update_board(%{assigns: %{movement: nil}} = socket), do: socket
   defp update_board(%{assigns: %{movement: changes, board: board}} = socket) do
     {_, board} =  changes.+
                     |> Map.merge(board)

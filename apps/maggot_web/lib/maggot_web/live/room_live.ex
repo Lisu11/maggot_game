@@ -50,6 +50,11 @@ defmodule MaggotWeb.RoomLive do
       {:noreply, socket}
     end
   end
+  @impl true
+  def handle_info({:initial_state, state}, socket) do
+    send_update(MaggotWeb.GameLive, id: "game-live", board: state)
+    { :noreply, socket }
+  end
 
   @impl true
   def handle_params(%{"game_action" => "give_up"}, _uri, socket) do
