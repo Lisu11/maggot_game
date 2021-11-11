@@ -14,9 +14,8 @@
             <%= live_component @socket, MaggotWeb.MenuLiveComponent,
                         id: "menu-live",
                         game_state: @game_state,
-                        room_id: @room_id,
+                        room: @room,
                         raw_message: @raw_message,
-                        presence_diff: @presence_diff,
                         presence: @presence,
                         topic: @topic,
                         current_user: @current_user %>

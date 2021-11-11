@@ -16,11 +16,9 @@ defmodule MaggotWeb.RoomLive do
     {:ok, assign(socket,
             topic: topic,
             room: room_atom,
-            room_id: room,
             raw_message: nil,
             movement: nil,
-            head: {500,500},
-            presence_diff: nil)}
+            head: {500,500})}
   end
 
 
@@ -32,16 +30,11 @@ defmodule MaggotWeb.RoomLive do
   end
   @impl true
   def handle_info(%{event: "presence_diff", payload: payload}, socket) do
+    send_update(MaggotWeb.ChatLive, id: "chat-live", presence_diff: payload)
     { :noreply,
       socket
-        |> assign(:presence_diff, payload)
         |> update_presence(payload)
     }
-  end
-  @impl true
-  def handle_info(:presence_diff_consumed, socket) do
-    Logger.debug(presence_diff_consumed: true)
-    {:noreply, assign(socket, :presence_diff, nil)}
   end
   @impl true
   def handle_info({:move, %{changes: changes, head: head}}, socket) do

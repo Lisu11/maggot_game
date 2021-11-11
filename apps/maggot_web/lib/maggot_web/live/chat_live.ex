@@ -13,16 +13,17 @@ defmodule MaggotWeb.ChatLive do
   end
 
   @impl true
+  def update(%{presence_diff: diff} = assigns, socket) do
+    socket
+     |> parse_diff(assigns.presence_diff)
+     |> Kernel.then(fn s -> {:ok, s} end)
+  end
+  @impl true
   def update(assigns, socket) do
     socket
-    #  |> IO.inspect()
      |> assign(assigns)
      |> assign_gamers(assigns.presence)
-    #  |> IO.inspect()
      |> parse_message(assigns.raw_message, assigns.current_user)
-    #  |> IO.inspect()
-     |> parse_diff(assigns.presence_diff)
-    #  |> IO.inspect()
      |> Kernel.then(fn s -> {:ok, s} end)
   end
 
@@ -119,16 +120,13 @@ defmodule MaggotWeb.ChatLive do
   defp assign_gamers(socket, _), do: socket
 
   defp parse_diff(socket, nil), do: socket
-  defp parse_diff(socket, payload) do
-    messages = socket.assigns.messages
-    [j_msgs, l_msgs] =
-      for {status, diffs} <- payload do
-         diffs_to_messages(diffs, status)
-      end
-    send(self(), :presence_diff_consumed)
-    assign(socket,
-      messages: messages ++ j_msgs ++ l_msgs,
-      presence_diff: nil)
+  defp parse_diff(%{assigns: %{messages: messages}} = socket, payload) do
+    messages =
+      Enum.reduce(payload, messages, fn {status, diffs}, acc ->
+          acc ++ diffs_to_messages(diffs, status)
+        end)
+
+    assign(socket, messages: messages)
   end
 
   defp diffs_to_messages(diff, status) do
