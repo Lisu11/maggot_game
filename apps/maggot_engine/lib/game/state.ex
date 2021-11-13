@@ -8,6 +8,8 @@ defmodule MaggotEngine.Game.State do
   @bugs_freq 10
 
   def new(width, height) do
+    Logger.info(new_width: width)
+    Logger.info(new_height: height)
     %{
       players: %{}, # player_pid => maggot
       stopped_players: [],
@@ -37,7 +39,8 @@ defmodule MaggotEngine.Game.State do
   def update_counter(%{counter: @bugs_freq} = state), do: %{state | counter: 0}
   def update_counter(%{counter: counter} = state), do: %{state | counter: counter + 1}
 
-  def add_stopped_player(%{stopped_players: sp} = state, pid) do
+  def add_stopped_player(%{stopped_players: sp, board: board} = state, pid) do
+    send(pid, {:initial_state, board.coords})
     %{state | stopped_players: [pid | sp]}
   end
 
@@ -56,13 +59,10 @@ defmodule MaggotEngine.Game.State do
     else
       {:error, :subscribe_first}
     end
-
   end
 
-  def remove_player(%{players: players, stopped_players: sp, changes: changes} = state, pid) do
-    %{state | players: Map.delete(players, pid),
-              stopped_players: [pid | sp],
-              changes: Changes.merge(changes, Changes.new(pid))}
+  def remove_player(%{changes: changes} = state, pid) do
+    %{state | changes: Changes.merge(changes, Changes.new(pid))}
   end
 
   def update_bugs(%{counter: 0, board: board, changes: changes} = state) do
@@ -72,7 +72,7 @@ defmodule MaggotEngine.Game.State do
   end
   def update_bugs(state), do: state
 
-  def init_changes(state), do: %{state | changes: Changes.empty() }
+  def clear_changes(state), do: %{state | changes: Changes.empty() }
 
 
   def clear_stopped_players(%{players: players, changes: changes, stopped_players: sp} = state) do
@@ -103,7 +103,7 @@ defmodule MaggotEngine.Game.State do
   def add_rest_of_the_stopped_maggot_to_changes(%{changes: changes, players: players} = state) do
     Changes.stops(changes)
       |> Enum.map(fn {pid, true} ->
-        Maggot.as_list_fast(players[pid]) end)
+        Maggot.as_points_list_fast(players[pid]) end)
       |> Enum.reduce(changes, fn points, changes ->
           Changes.new([], points)
             |> Changes.merge(changes)
@@ -112,11 +112,30 @@ defmodule MaggotEngine.Game.State do
   end
 
   def notify_players(%{players: players, stopped_players: sp} = state) do
+    state
+      |> notify_active()
+      |> notify_stopped()
+  end
+
+  defp notify_active(%{players: players} = state) do
     players
       |> Map.keys()
-      |> Kernel.++(sp)
-      |> Enum.each(&send(&1, {:change, state.changes}))
+      |> Enum.each(&send(&1,
+          construct_message(state, players[&1].head)))
     state
+  end
+  defp notify_stopped(%{stopped_players: pls, changes: changes} = state) do
+    Enum.each(pls, &send(&1, construct_message(state)))
+    state
+  end
+
+  defp construct_message(state, head \\ nil)
+  defp construct_message(%{changes: changes, board: board}, nil) do
+    head = {board.width /2, board.height /2}
+    {:move, %{changes: changes, head: head}}
+  end
+  defp construct_message(%{changes: changes}, head) do
+    {:move, %{changes: changes, head: head}}
   end
 
   defp get_pids_for_same_heads(%{players: players}) do
@@ -166,14 +185,19 @@ defmodule MaggotEngine.Game.State do
   end
 
   defp maybe_move_maggot({pid, maggot}, %{board: board}) do
-    head = Maggot.forward(maggot)
-    cond do
-      Board.collide(board, head) ->
-        { pid,
-          {Changes.new(pid), maggot}}
-      true ->
-        { pid,
-          maybe_eat_bug_and_move(maggot, board)}
+    with {_x, _y} = head <- Maggot.forward(maggot) do
+      cond do
+        Board.collide(board, head) ->
+          { pid,
+            {Changes.new(pid), maggot}}
+        true ->
+          { pid,
+            maybe_eat_bug_and_move(maggot, board)}
+      end
+    else
+      error ->
+        Logger.error(inspect(error))
+        Logger.error(maggot: inspect(maggot))
     end
   end
 

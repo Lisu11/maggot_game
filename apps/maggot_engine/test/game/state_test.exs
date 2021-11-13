@@ -211,10 +211,10 @@ defmodule MaggotEngineTest.StateTest do
     end
   end
 
-  describe "init_changes/1" do
+  describe "clear_changes/1" do
 
     test "should put empty changes into state", %{state: state} do
-      up_state = State.init_changes(state)
+      up_state = State.clear_changes(state)
 
       assert up_state.changes == Changes.empty()
     end
@@ -224,7 +224,7 @@ defmodule MaggotEngineTest.StateTest do
   describe "notify_players/1" do
 
     setup %{state: state} do
-      maggots = for _ <- 1..10 do
+      maggots = for _ <- 1..11 do
         x = :rand.uniform(state.board.width)
         y = :rand.uniform(state.board.height)
         Maggot.new!({x,y}, fn _ -> true end)
@@ -232,7 +232,7 @@ defmodule MaggotEngineTest.StateTest do
 
       asserter = fn ->
         receive do
-          {:change, changes} ->
+          {:move, %{changes: changes}} ->
             assert changes === state.changes
           anything_else ->
             Logger.error(inspect(anything_else))
@@ -258,10 +258,10 @@ defmodule MaggotEngineTest.StateTest do
       stopped = for _ <- 1..10 do
         spawn(asserter)
       end
+
       active = Map.new(for i <- 1..10 do
         {spawn(asserter), Enum.at(maggots, i)}
       end)
-
       State.notify_players(%{state | stopped_players: stopped,
                                      players: active})
     end

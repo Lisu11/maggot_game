@@ -1,9 +1,9 @@
 defmodule MaggotEngine.Game do
   alias MaggotEngine.Game.{State, Maggot}
   use GenServer
-  @width 250
-  @height 150
-  @framerate 10
+  @width 300
+  @height 300
+  @framerate 20
 
   @impl true
   def init(_) do
@@ -18,6 +18,10 @@ defmodule MaggotEngine.Game do
   @impl true
   def handle_cast({:unsubscribe, from}, state) do
     { :noreply, State.remove_stopped_player(state, from) }
+  end
+  @impl true
+  def handle_cast({:leave_game, from}, state) do
+    { :noreply, State.remove_player(state, from) }
   end
 
   @impl true
@@ -60,10 +64,10 @@ defmodule MaggotEngine.Game do
     GenServer.call(pid, :join_game)
   end
 
-  # def leave_game(room_name) do
-  #   pid = Process.whereis(room_name)
-  #   GenServer.call(pid, :leave_game)
-  # end
+  def kill_me(room_name) do
+    pid = Process.whereis(room_name)
+    GenServer.cast(pid, {:leave_game, self()})
+  end
 
   def change_direction(room_name, direction) when direction in [:n, :e, :s, :w] do
     pid = Process.whereis(room_name)
@@ -75,7 +79,6 @@ defmodule MaggotEngine.Game do
   defp transform_state_and_notify_players(state) do
     state
       |> State.update_counter()
-      |> State.init_changes()
       |> State.step()
       |> State.detect_next_step_collisions() # needs to be called AFTER step
       |> State.add_rest_of_the_stopped_maggot_to_changes()
@@ -83,6 +86,7 @@ defmodule MaggotEngine.Game do
       |> State.update_board()
       |> State.update_bugs() # needs to be called AFTER update_board
       |> State.notify_players()
+      |> State.clear_changes()
 
   end
 

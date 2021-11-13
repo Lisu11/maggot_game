@@ -28,7 +28,7 @@ defmodule MaggotWeb.GameLive do
                    %{"key" => arrow},
                    %{assigns: %{room: room, game_state: :playing}} = socket)
         when arrow in ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"] do
-    Logger.debug(change_direction: arrow)
+    Logger.debug(change_direction: arrow <> " #{arrow_to_direction(arrow)}")
 
     MaggotEngine.Game.change_direction(room, arrow_to_direction(arrow))
     {:noreply, socket}
