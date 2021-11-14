@@ -1,18 +1,33 @@
-<ul class="navbar-nav mt-2 mt-lg-0 pl-5 pr-2" >
+<ul class="navbar-nav mt-2 mt-lg-0 pl-5 pr-0 mr-3" >
   <%= if @current_user do %>
-    <li class="nav-item navbar-text text-white">
-      <i class="fa fa-user-circle-o" aria-hidden="true"></i>
-      <%= @current_user.email %></li>
-    <li class="nav-item">
-      <%= link "Settings",
-                to: Routes.user_settings_path(@conn, :edit),
-                class: "nav-link" %>
+
+    <li class="nav-item dropdown">
+        <a class="nav-link navbar-text text-white dropdown-toggle"
+                href="#"
+                id="dropdownProfile"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false">
+            <i class="fa fa-user-circle-o" aria-hidden="true"></i>
+            <%= @current_user.username %>
+          </a>
+
+           <div class="dropdown-menu mr-5" aria-labelledby="dropdownProfile">
+                <a class="dropdown-item disabled bg-warning">Become Pro</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item disabled">Profile</a>
+                <%= link "Settings",
+                  to: Routes.user_settings_path(@conn, :edit),
+                  class: "dropdown-item" %>
+                <div class="dropdown-divider"></div>
+                <%= link "Log out",
+                    to: Routes.user_session_path(@conn, :delete),
+                    method: :delete,
+                    class: "dropdown-item" %>
+            </div>
     </li>
     <li class="nav-item">
-        <%= link "Log out",
-                to: Routes.user_session_path(@conn, :delete),
-                method: :delete,
-                class: "nav-link" %>
+
     </li>
   <% else %>
     <li class="nav-item">

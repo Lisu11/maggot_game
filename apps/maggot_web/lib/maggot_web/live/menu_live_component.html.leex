@@ -1,15 +1,15 @@
 <div id="menu-controls-container" class="mt-2 d-flex justify-content-between">
     <%= live_patch "Join Game",
-                to: Routes.live_path(@socket, MaggotWeb.RoomLive, @room, game_action: :join),
+                to: Routes.room_path(@socket, :index, @room,  game_action: :join),
                 class: "btn btn-success btn-lg " <> control_class_for_state :join, @game_state %>
     <div>
     <%= @game_state %>
     </div>
     <%= live_patch "Give up",
-                to: Routes.live_path(@socket, MaggotWeb.RoomLive, @room, game_action: :give_up),
+                to: Routes.room_path(@socket, :index, @room, game_action: :give_up),
                 class: "btn btn-danger btn-lg " <> control_class_for_state :give_up, @game_state  %>
 </div>
-<div id="chat-container" class="card  mt-2 p-0 pr-2 d-flex flex-column">
+<div id="chat-container" class="card  mt-2 p-0 pr-2 d-flex flex-column ">
     <div class="card-header mb-0">
         <ul class="nav nav-pills card-header-tabs " >
             <li class="nav-item" role="presentation">
@@ -36,9 +36,9 @@
             </li>
         </ul>
     </div>
-    <div class="card-body tab-content" id="pills-tabContent">
+    <div class="card-body tab-content h-100 flex-grow-1" id="pills-tabContent">
 
-            <div class="tab-pane fade <%= if @tab == "chat", do: "show d-block", else: "d-none" %> "
+            <div class="tab-pane h-100 fade <%= if @tab == "chat", do: "show d-block", else: "d-none" %> "
                 id="pills-chat"
                 role="tabpanel"
                 aria-labelledby="pills-chat-tab">

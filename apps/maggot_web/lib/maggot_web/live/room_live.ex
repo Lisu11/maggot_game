@@ -85,11 +85,12 @@ defmodule MaggotWeb.RoomLive do
               MapSet.new()
             end)
   end
+
   defp subscribe_if_connected(socket, topic, room) do
     if connected? socket do
       Endpoint.subscribe(topic)
-      MaggotEngine.open_new_room(room)
-      MaggotEngine.Game.subscribe(room)
+
+
       assign(socket, game_state: :subscribed)
     else
       assign(socket, game_state: :unsubscribed)
