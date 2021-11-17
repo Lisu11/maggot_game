@@ -8,22 +8,24 @@ defmodule MaggotEngine.Game.Maggot do
   require Logger
 
 
-  def new!({x, y} = head, validator) do
-    tail = {x-1, y}
-    with  true <- validator.(head),
-          true <- validator.(tail) do
+  def new([{x, y}, {x_, y_}], direction)
+   when direction in [:n, :e, :s] do
+      head = {x, y}
+      tail = {x_, y_}
       %Maggot{
-        head: {x, y},
+        head: head,
         mid_segments: [],
-        tail: {x-1, y},
-        direction: :e,
+        tail: tail,
+        direction: direction,
         bugs: %{},
         queue: Queue.new([{head, :e}, {tail, :e}])
       }
-    else
-      false -> raise MatchError
-      error -> error
-    end
+  end
+  def new([head, _, _ | _] = seg, direction) do
+    tail = List.last(seg)
+    mid = seg |> List.delete(tail) |> List.delete(head)
+    maggot = new([head, tail], direction)
+    %Maggot{maggot | mid_segments: mid}
   end
 
   def as_points_list_fast(%Maggot{head: h, tail: t, mid_segments: seg}) do

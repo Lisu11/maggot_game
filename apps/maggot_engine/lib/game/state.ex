@@ -5,7 +5,7 @@ defmodule MaggotEngine.Game.State do
   alias MaggotEngine.Game.Changes
   require Logger
 
-  @bugs_freq 10
+  @bugs_freq 20
 
   def new(width, height) do
     Logger.info(new_width: width)
@@ -228,11 +228,21 @@ defmodule MaggotEngine.Game.State do
   defp random_maggot(board) do # it can take long time figure out better solution
     x = :rand.uniform(board.width + 1) - 1
     y = :rand.uniform(board.height + 1) - 1
-    try do
-      Maggot.new!({x, y}, &Board.empty_spot(board, &1))
-    rescue
-      MatchError ->
+    if generated_position_valid(board, {x, y}) do
+      d = compute_best_direction(board, {x, y})
+      Maggot.new([{x, y}, {x-1, y}], d)
+    else
         random_maggot(board)
     end
+  end
+  defp generated_position_valid(board, {x, y}) do
+    Board.empty_spot(board, {x, y}) and Board.empty_spot(board, {x-1, y})
+  end
+  defp compute_best_direction(%Board{width: w, height: h} = board, {x, y}) do
+    dirs = %{w-x => :e, y => :n, h-y => :s}
+    dirs
+      |> Map.keys()
+      |> Enum.max()
+      |> then(&dirs[&1])
   end
 end

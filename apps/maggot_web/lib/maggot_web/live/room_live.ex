@@ -1,11 +1,12 @@
 defmodule MaggotWeb.RoomLive do
   use MaggotWeb, :live_view
   require Logger
-  alias MaggotWeb.{Endpoint, Presence}
+  alias MaggotWeb.{Endpoint, Presence, Lobby}
 
   @impl true
   def mount(%{"room_id" => room}, %{"user_token" => token}, socket) do
     Logger.debug(mount: __MODULE__)
+    Logger.debug(live_action: socket.assigns.live_action)
     topic = "room:" <> room
     room_atom = String.to_atom(room)
     socket =  socket
@@ -21,6 +22,11 @@ defmodule MaggotWeb.RoomLive do
             head: {500,500})}
   end
 
+  def blur(:unsubscribed), do: "blured"
+  def blur(_), do: ""
+
+  def spinner(:unsubscribed), do: ""
+  def spinner(_), do: "d-none"
 
   @impl true
   def handle_info(%{event: "new-message", payload: message}, socket) do
@@ -89,12 +95,21 @@ defmodule MaggotWeb.RoomLive do
   defp subscribe_if_connected(socket, topic, room) do
     if connected? socket do
       Endpoint.subscribe(topic)
-
+      socket = subscribe_room(socket, room)
 
       assign(socket, game_state: :subscribed)
     else
       assign(socket, game_state: :unsubscribed)
     end
+  end
+
+  defp subscribe_room(%{assigns: %{live_action: :index}} = socket, room) do
+    Lobby.join_room(room)
+    socket
+  end
+  defp subscribe_room(%{assigns: %{live_action: :new}} = socket, room) do
+    Lobby.create_new_room(room)
+    push_redirect(socket, to: Routes.room_path(socket, :index, room))
   end
 
   defp assign_user(socket, token) do

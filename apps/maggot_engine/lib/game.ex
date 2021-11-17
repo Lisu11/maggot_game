@@ -40,6 +40,7 @@ defmodule MaggotEngine.Game do
 
 
   @impl true
+  def handle_info(:tick, %{players: ps} = state) when ps == %{}, do: {:noreply, state}
   def handle_info(:tick, state) do
     { :noreply, transform_state_and_notify_players(state) }
   end

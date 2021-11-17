@@ -75,6 +75,7 @@ defmodule MaggotWeb.Router do
     pipe_through [:browser, :require_authenticated_user]
 
     live "/game/:room_id", RoomLive, :index
+    live "/game/new/:room_id", RoomLive, :new
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings", UserSettingsController, :update
     get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email

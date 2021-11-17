@@ -1,5 +1,7 @@
 <div class="container-fluid bg-light fill-remaing-height">
-    <div class="row h-100">
+    <div class="spinner <%= spinner(@game_state) %>">
+    </div>
+    <div class="row h-100 <%= blur(@game_state) %>">
 
         <div id="game-container" class="col-lg-8 col-12 d-flex mt-2 mb-0">
             <%= live_component @socket, MaggotWeb.GameLive,

@@ -11,7 +11,7 @@
 
          <li class="nav-item ">
          <%= link "Play",
-            to: Routes.room_path(@conn, :index, MaggotWeb.Lobby.get_random_room_id()),
+            to: Routes.room_path(@conn, :new, MaggotWeb.Lobby.get_random_room_id()),
             class: "nav-link"  %>
 
         </li>
